@@ -1,0 +1,118 @@
+\section{Regret bounds for Mixing-LinUCB}
+\label{sec:bandit_regret}
+
+In this section, we establish worst-case and gap-dependent cumulative regret bounds for mixing UCB algorithm (Mixing Lin-UCB). However, to account for the fact that Mixing-LinUCB selects actions with delays, the standard elliptical potential arguments must be modified. Throughout this section, we let $R_t = \siprod{\theta^{\star}}{X_t^{\star} - X_t}$ (where $X_t^\star = \argmax_{x\in\X_t}\langle \theta^\star, x\rangle$) denote the regret in round $t$, and $\beta_{t}^2 = dp\log\tfrac{(B+1)^2e\max(dp,t+d)}{dp} + 4\lambda B^2 + 2t\phi_d (B+1) + 2d\log\tfrac{d}{\delta}$ denote the squared radius of the ellipsoid $\mathcal{C}_t$ in \Cref{cor:conf}. %\ham{So the constraint is $\|\theta\wh\theta_t\|_{V_t}^2 \leq \beta_t^2$}.
+
+\subsection{Worst-case regret bounds}
+
+First, following the regret analysis in \citet{abbasi2011improved} (see also Section 19.3 in \citealp{lattimore2020bandit}), we upper bound the instantaneous regret. From our boundedness assumptions ($\theta^\star\in\mathcal B(B)$ and $\X_t\subseteq\mathcal B(1)$), we easily deduce that $R_t \leq 2B$. Under the event that our confidence sequence contains $\theta^{\star}$ at every step $t$, we have another bound on $R_t$. If we define $\wt\theta_{t-d} \in \mathcal{C}_{t-d}$ to be the point at which $\siprod{\wt\theta_{t-d}}{X_t} = \mathrm{UCB}_{\mathcal{C}_{t-d}}(X_t)$, then from the definition of $X_t$ we have
+\begin{align*}
+\siprod{\theta^{\star}}{X_t^{\star}} &\leq \max_{x \in \mathcal{X}_{t}}\max_{\theta \in \mathcal{C}_{t-d}}\siprod{\theta}{x}\\ &= \max_{x \in \mathcal{X}_{t}} \ucb_{\C_{t-d}}(x) \\&= \ucb_{\C_{t-d}}(X_t)\\&=\siprod{\wt\theta_{t-d}}{X_t}\,.
+\end{align*}
+
+Recall that, for all $s$, $V_s = \Lambda_s + \lambda\mathrm{Id}$, which is invertible as $\lambda>0$. Thus, by Cauchy-Schwarz,
+\begin{equation*}
+R_t \leq \siprod{\wt\theta_{t-d} - \theta^{\star}}{X_t} \leq \|\wt\theta_{t-d} - \theta^{\star}\|_{V_{t-d}}\|X_t\|_{V_{t-d}^{-1}} \leq 2\beta_{t-d}\|X_t\|_{V_{t-d}^{-1}}\,.
+\end{equation*}
+
+This means that the instantaneous regret satisfies the bound
+\begin{equation}
+R_t \leq 2\max(B, \beta_{t-d})\min(1, \|X_t\|_{V_{t-d}^{-1}})\,.\label{eqn:inst_reg}
+\end{equation}
+
+Next, we separate the regret suffered in the first $d$ rounds and the remaining $T-d$ rounds. We then use Cauchy-Schwarz once more, and the fact that $\beta_{t}$ is increasing in $t$, to obtain
+\begin{align*}
+&\Reg(T) \leq 2dB + \sqrt{(T-d){\textstyle\sum_{t=d+1}^{T}}R_t^2}\\
+&\leq 2dB + \sqrt{4(T-d)\max(B^2, \beta_{T-d}^2){\textstyle\sum_{t=d+1}^{T}}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2)}\,.
+\end{align*}
+
+At this point, we must depart from the standard linear UCB analysis \citep{abbasi2011improved, lattimore2020bandit}. We bound the sum of the \emph{elliptical potentials} $\sum_{t=d+1}^{T}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2)$ using the following variant of the well-known ``elliptical potential lemma'' (see Appendix), which accounts for the fact that the feature covariance matrix $V_{t-d}$ is updated with a delay of $d$ steps.
+\begin{lemma}
+For all $T \geq d+1$,
+\begin{equation*}
+\sum_{t=d+1}^{T}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2) \leq 2dp\log(1 + \tfrac{T}{\lambda dp})\,.
+\end{equation*}
+\label{lem:delay_elliptical}
+\end{lemma}
+
+We can now state a worst-case regret upper bound for Mixing-LinUCB.
+
+
+\begin{theorem}
+\label{theorem:regret_bound}
+
+Fix $\lambda = 1/B^2$, $d>0$ and $\delta\in(0,1)$. With probability at least $1 - \delta$, for all $T > d$, the regret of Mixing-LinUCB satisfies
+\begin{align*}
+\Reg(T) \leq 2dB + \sqrt{8dpT\max(B^2, \beta_{T}^2)\log(1 + \tfrac{B^2T}{dp})}\,.
+\end{align*}
+\label{thm:worst_case_reg}
+\end{theorem}
+
+From the definition of $\beta_T$, we see that this regret bound is of the order
+\begin{align*}
+\Reg(T)  &= \mathcal{O}\Big(dB + dp\sqrt{T}\log\tfrac{TB}{dp} \\+& T\sqrt{Bdp\phi_d\log\tfrac{TB}{dp}} + d\sqrt{pT\log\tfrac{TB}{p\delta}}\Big)\,.
+\end{align*}
+
+For any fixed (\emph{i.e.}, not depending on $T$) delay $d$, this regret bound is linear in $T$. To obtain meaningful regret bounds, it is therefore crucial to set $d$ as a function of $T$ and the rate at which the mixing coefficients decay to zero. We point out that if $T$ is unknown, one could probably use a more general framework where the delay is time dependent which might lead to non-trivial results, but we do not pursue this here. Under the assumption that the noise variables are either geometrically or algebraically mixing, we obtain the following worst-case regret bounds.
+
+\begin{corollary}
+\label{cor:geometric_mixing}
+Suppose that the noise satisfies Assumption \ref{ass:mixing-subgaussianity} with $\phi_d=Ce^{-\frac{d}{\tau}}$ for some $C,\tau >0$ (\emph{geometric mixing}), and set $d = \lceil \tau\log\tfrac{BCT}{p}\rceil$. Then, the regret of Mixing-LinUCB satisfies
+\begin{align*}
+&\Reg(T) = \mathcal{O}\Big(\tau p\sqrt{T}\left(\log\tfrac{TB\max(1,C)}{p}\right)^2 \\  &\quad+p\sqrt{T\tau}\log\tfrac{TB\max(1,C)}{p} + \tau\log\tfrac{BCT}{p}\sqrt{pT\log\tfrac{TB}{p\delta}}\Bigg)\,.
+\end{align*}
+\end{corollary}
+
+\begin{corollary}
+Suppose that the noise satisfies Assumption \ref{ass:mixing-subgaussianity} with $\phi_d=Cd^{-r}$ for some $C>0$ and $r >0$ (\emph{algebraic mixing}), and set $d=\lceil CT^{1/(1+r)}\rceil$. Then, the regret of Mixing-LinUCB satisfies
+\begin{align*}
+&\Reg(T) =\mathcal{O}\Big(CBT^{1/(1+r)} + CT^{\frac{3+r}{2(1+r)}}p\log\tfrac{TB}{p} \\&+ CT^{\frac{3+r}{2(1+r)}}\sqrt{Bp\log\tfrac{T^{r/(1+r)}B}{Cp}} + CT^{\frac{3+r}{2(1+r)}}\sqrt{p\log\tfrac{TB}{p\delta}}\Big)\,.
+\end{align*}
+\label{cor:algebraic_mixing}
+\end{corollary}
+
+Up to a factor of $\tau\log T$, the bound for geometrically mixing noise matches the regret bound for linear UCB with i.i.d.~noise. This bound is trivial for $r\leq 1$, however for $r>1$ we get sublinear regret, and in particular we recover standard rates up to logarithmic factors in the limit where $r \to \infty.$
+
+\subsection{Gap-dependent regret bounds}
+
+Under the assumption that, each round, the gap between the expected reward of the optimal arm and the expected reward of any other arm is at least $\Delta > 0$, we get regret bounds with better dependence on $T$. More precisely, define the \emph{minimum gap} $\Delta = \min_{t \in [T]}\min_{x \in \mathcal{X}_t: x \neq X_t^{\star}}\siprod{X_t^{\star} - x}{\theta^{\star}}$, and assume that $\Delta > 0$. Since we either have $R_t = 0$ or $R_t \geq \Delta > 0$, it follows that
+\begin{equation*}
+R_t \leq R_t^2/\Delta\,.
+\end{equation*}
+
+In our worst-case analysis, we showed that
+\begin{equation*}
+\sum_{t=d+1}^{T}R_t^2 \leq 8dp\max(B^2, \beta_T^2)\log(1 + \tfrac{T}{\lambda dp})\,.
+\end{equation*}
+
+Combined with the previous inequality, we obtain the following gap-dependent regret bound.
+
+\begin{theorem}
+Fix $\lambda = 1/B^2$, $d>0$, and $\delta\in(0,1)$. With probability at least $1 - \delta$, for all $T > d$, the regret of Mixing-LinUCB satisfies
+\begin{align*}
+\Reg(T) \leq 2dB + \frac{8dp}{\Delta}\max(B^2, \beta_{T}^2)\log\left(1 + \frac{B^2T}{dp}\right)\,.
+\end{align*}
+\label{thm:gap_reg}
+\end{theorem}
+
+Similarly to the worst-case bound in \Cref{thm:worst_case_reg}, for any fixed $d > 0$, this regret bound is linear in $T$. By setting $d$ as a suitable function of $T$, we obtain the following gap-dependent regret bounds under geometrically or algebraically mixing noise. 
+
+\begin{corollary}
+\label{cor2:geometric_mixing}
+Suppose that the noise variables are geometrically mixing and set $d = \lceil \tau\log\tfrac{BCT}{p}\rceil$. Then the regret of Mixing-LinUCB satisfies
+\begin{align*}
+\Reg(T) = \mathcal{O}\left(\frac{8\tau p}{\Delta}\left(\log\frac{BCT}{p}\right)^2\log\left(1 + \frac{B^2T}{p\tau \log\frac{BCT}{p}}\right)\left(\frac{p}{2}\log\frac{T}{p\tau}+\log \frac{\tau\log \frac{BCT}{p}}{\delta}\right)\right)\,.
+\end{align*}
+\label{cor:gap_reg_geo}
+\end{corollary}
+
+\begin{corollary}
+\label{cor2:algebraic_mixing}
+Suppose that the noise variables are algebraically mixing and set $d=\lceil CT^{1/(1+r)}\rceil$. Then the regret of Mixing-LinUCB satisfies
+\begin{equation*}
+\OO\left( \frac{8Cp}{\Delta}T^{\frac{2}{1+r}}\log\left(1 + \frac{B^2T}{pCT^{1/(1+r)}}\right)\left(\frac{p}{2}\log\frac{(B+1)^2eT}{p}+\log \frac{CT^{1/(1+r)}}{\delta}\right)\right)\,.
+\end{equation*}
+\label{cor:gap_reg_alg}
+\end{corollary}
+
+%The bound for geometrically mixing noise is polylogarithmic in $T$. However The bound for algebraically mixing noise is polynomial in $T$\ham{Some comment on the rates for algebraically mixing noise. Can we always get sublinear regret? Is the best $d$ for the worst-case bound the same as the best $d$ for the gap-dependent bound? If not, we can add an adaptive algorithm/guarantee to the list of open questions.}

@@ -1,0 +1,284 @@
+\section{Constructing the confidence sequence}
+\label{sec:conf_sets}
+
+In this section we derive a confidence sequence for linear models with non-i.i.d.~noise. First, we briefly describe the online-to-confidence-set conversion scheme from \citet{clerico2025confidence}, which serves as our starting point. We then extend this technique to handle mixing noise.
+
+\subsection{Online-to-confidence set conversion for i.i.d.~data}
+\label{sec:conf_set_proof}
+Before proceeding for the analysis of mixing sub-Gaussian noise, which is the focus of this work, we start by describing how to derive a confidence sequence when the noise is independent (or conditionally) centred and sub-Gaussian across different rounds, as in \cite{clerico2025confidence}. The online-to-confidence sets framework that we consider instantiates an abstract game played between an \emph{online learner} and an \emph{environment}. We define the squared loss $\ell_s(\theta) = \frac{1}{2}(\iprod{\theta}{X_s} - Y_s)^2$. For each round $s = 1, \dots, t$, the following steps are repeated:
+\begin{enumerate}
+\item the environment reveals $X_s$ to the learner;
+\item the learner plays a distribution $Q_s \in \Delta_{\mathbb{R}^p}$;
+\item the environment reveals $Y_s$ to the learner;
+\item the learner suffers the log loss $\mathcal{L}_s(Q_s) = -\log\int_{\mathbb{R}^p}\exp(-\ell_s(\theta))\mathrm{d}Q_s(\theta)$.
+\end{enumerate}
+
+%\ham{Should we mention that this is slightly different to the game in \citet{clerico2025confidence}, since we are only interested in mixture forecasters? Maybe it isn't worth the space.} 
+This game is a special case of a well-studied problem called \emph{sequential probability assignment} \citep{cesabianchi2006prediction}. The learner can use any strategy to choose $Q_1, \dots, Q_t$, as long as each $Q_s$ depends only on $X_1, Y_1, \dots, X_{s-1}, Y_{s-1}, X_s$. We define the \emph{regret} of the learner against a (possibly data-dependent) comparator $\bar{\theta} \in \mathbb{R}^p$ as
+\begin{equation*}
+\Regret_t(\bar{\theta}) = \sum_{s=1}^{t}\mathcal{L}_s(Q_s) - \sum_{s=1}^{t}\ell_s(\bar{\theta})\,.
+\end{equation*}
+
+
+\cite{clerico2025confidence} provide a regret bound upper bound (Proposition 3.1 there) for when the learner's strategy is from an \emph{exponential weighted average} (EWA) forecaster with a centred Gaussian prior $Q_1$. However, to account for the presence of dependencies in our analysis, we will need the prior's support to be bounded. We hence state here a regret bound (whose proof is deferred to Appendix \ref{app:prop2}) for the regret of an EWA forecaster with a uniform prior. %\eug{Shall we add comment about the proof being close to Foster's one?} 
+
+%No! We need the support of each $Q_s$ to be contained within an $\ell_2$-ball (\ham{technically this is sufficient but not necessary for the blocking stuff to work, but let's not go there}), so we use the EWA forecaster with a uniform prior instead. I'd guess that the regret bound below is not new, but I'm not sure where it comes from (no internet at home, so I can't look it up). It's quite similar to the Dylan Foster improper logistic regression regret bound, except we don't need to use the Lipschitz constant of $\sum_s\ell_s$, which depends on $\max_{s}Y_t$.
+
+\begin{prop}
+Fix $B>0$ and consider the EWA forecaster with as prior the uniform distribution on $\mathcal B(B+1)$. Then, for all $\bar{\theta}\in\mathcal B(B)$ and any $t\geq 1$, %\eug{now this is stated with max replaced by sum to have upper bound concave and use the pre-made delayed regret bound... can be improved probably if needed...} 
+\begin{equation*}
+\Regret_t(\bar{\theta}) \leq \frac{p}{2}\log\frac{(B+1)^2e\max(p,t)}{p}\,.
+\end{equation*}
+\label{pro:uniform_ewa_regret}
+\end{prop}
+
+We remark that, by adding and subtracting the total log loss of the learner, the excess loss of $\theta^\star$ (relative to $\bar{\theta}$) can be rewritten as
+\begin{equation}\label{eq:otc_dec}
+\sum_{s=1}^t\ell_s(\theta^{\star}) - \sum_{s=1}^t\ell_s(\bar{\theta}) = \Regret_t(\bar{\theta}) + \sum_{s=1}^t\ell_s(\theta^{\star}) - \sum_{s=1}^{t}\mathcal{L}_s(Q_s).
+\end{equation}
+This simple decomposition is the key idea in the online-to-confidence sets scheme. 
+
+Since the noise is conditionally sub-Gaussian and the distributions played by the online learner are predictable (meaning that $Q_s$ cannot depend on $Y_s$), $\sum_{s=1}^t\ell_s(\theta^{\star}) - \sum_{s=1}^{t}\mathcal{L}_s(Q_s)$ is the logarithm of a non-negative super-martingale (cf. the no-hypercompression
+inequality in \citealp{grunwald2007minimum} or Proposition 2.1 in \citealp{clerico2025confidence}) with respect to the noise filtration $(\F_t)_{t\geq 1}$. For simplicity, as already mentioned in Section \ref{subsec:LSB} and since this will be the case for our bandit strategy, we assume throughout the paper that $X_t$ is fully determined given the past noise . Henceforth, from Ville's inequality (a classical anytime valid Markov-like inequality that holds for non-negative super-martingales) one can easily derive that $\theta^\star\in\C_t$ (uniformly for all $t$) with probability at least $1-\delta$, where
+$$\mathcal{C}_t = \left\{\theta : \sum_{s=1}^{t}\ell_s(\theta) - \sum_{s=1}^{t}\ell_s(\bar{\theta}) \leq \Regret_t(\bar{\theta}) + \log\frac{1}{\delta}\right\}\,.$$
+This result can be relaxed by replacing $ \Regret_t(\bar{\theta})$ by any known regret upper bound for the online algorithm used in the abstract game (\emph{e.g.}, the bound of Proposition \ref{pro:uniform_ewa_regret} for the EWA forecaster). 
+
+
+%This leads to the next result.
+
+%\begin{prop}[Theorem 2.2 in \citet{clerico2025confidence}]
+%For any $\delta \in (0, 1]$, the sequence of sets $\mathcal{C}_1, \mathcal{C}_2, \dots$ satisfies $\mathbb{P}(\forall t \geq 1, \theta^{\star} \in \mathcal{C}_t) \geq 1 - \delta$, where
+%\begin{equation*}
+%\mathcal{C}_t = \left\{\theta \in \mathbb{R}^p: \sum_{s=1}^{t}\ell_s(\theta) - \sum_{s=1}^{t}\ell_s(\bar{\theta}) \leq \Regret_t(\bar{\theta}) + \log\tfrac{1}{\delta}\right\}\,.
+%\end{equation*}
+%\label{prop:standard_otcs}
+%\end{prop}
+
+%Compared to the regret bound for the Gaussian prior, we don't get a log det bound and it only holds for comparators with norm less than $B$. However, the constants are pretty reasonable and we can choose the comparator to be the constrained MLE/ERM. \ham{If we use this, I suggest putting the proof in the appendix. To avoid modifying loads of the tex files, I'm putting the proof here for now.}
+
+
+
+%Using this regret bound and the constraint $\|\theta^{\star}\|_2 \leq B$, we can give an explicit form to the loss-based confidence sequence in Proposition \ref{prop:standard_otcs} in the case of i.i.d.~noise.
+
+%\begin{theorem}\label{thm:conf_seq_iid}
+%Define $\wh\theta_t = \argmin_{\|\theta\|_2 \leq B}\{\sum_{s=1}^{t}\ell_s(\theta)\}$ to be the constrained ERM. Fix $\delta\in(0,1)$, $\lambda>0$, and let $V_t = \sum_{s=1}^t X_s X_s^\top + \lambda\mathrm{Id}$. Define
+%\begin{equation*}
+%\mathcal{C}_t = \left\{\theta \in \mathbb{R}^p: \|\theta - \wh\theta_t\|_{V_t}^2 \leq p\log\tfrac{(B+1)^2e\max(p,t)}{p} + 2\lambda B^2 + 2\log\tfrac{1}{\delta}\right\}\,.
+%\end{equation*}
+%Then, the sequence $(\C_t)_{t\geq 0}$ is a confidence sequence for $\theta^\star$, namely $$\mathbb{P}\big(\theta^{\star} \in \mathcal{C}_t\,,\;\forall t\geq 1\big) \geq 1 - \delta\,.$$
+%\label{thm:standard_norm_cs}
+%\end{theorem}
+
+%With the exception that we constructed it using distributions $Q_1, Q_2, \dots$ with support contained in $\mathbb{B}_2^p(B+1)$, this confidence sequence is pretty much identical to the OFUL confidence sequence from \citet{abbasi2011improved}. If we instead use the slightly disgusting choice $\wh\theta_t = \argmin_{\|\theta\|_2 \leq B}\{\sum_{s=1}^{t}\ell_s(\theta) + \frac{\lambda}{2}\|\theta\|_2^2\}$, then we get the same confidence sequence, except $2\lambda B^2$ is replaced with $\frac{\lambda}{2} B^2$. \ham{I would also suggest putting this proof in the appendix.}
+%\eug{Shall we leave it like this or improve the factor $2\lambda B^2$ to $\frac{\lambda}{2} B^2$ by changing the comparator to the regularised case?}
+
+
+%I think the confidence sequence for mixing noise will be $\mathcal{C}_1, \mathcal{C}_2, \dots$, where
+%\begin{equation*}
+%\mathcal{C}_t = \left\{\theta \in \mathbb{R}^p: \|\theta - \wh\theta_t\|_{V_t}^2 \leq dp\log\tfrac{(B+1)^2e\max(dp,t)}{dp} + 2\lambda B^2 + t(B+1)\phi_d + 2d\log\tfrac{d}{\delta}\right\}\,.
+%\end{equation*}
+
+%Can we have a time-dependent $d$? If not, we could set $d$ at the end of the bandit regret analysis (assuming the number of rounds is known in advance).
+
+%We now describe a general method to construct confidence sequences for the standard linear bandit problem, via a 
+%reduction to regret analysis of online learning algorithms. This approach, named \emph{online-to-confidence set} 
+%conversion, was first proposed by \cite{abbasi2011improved}, and has later been extended and improved by several works 
+%(\cite{clerico2025confidencesequencesgeneralizedlinear} \eug{add more stuff... there are many refs...}).
+%
+%In what follows, we fix a confidence level $\delta\in(0,1)$. A confidence sequence $(C_t)_{t\geq 1}$ for $\theta^\star$ 
+%is a sequence of random sets such that
+%\[\mathbb{P}\big( \theta^* \in C_t,\,\forall t\geq 1\big) \geq 1-\delta\,,\]
+%where the randomness of the $C_t$ is due to the noise sequence $(\ee_t)_{t\geq 1}$. 
+%We will focus on confidence sets and sequences that can be defined as the set of parameters $\theta$ whose likelihood 
+%$p(y_t|x_1,\dots,x_t,\theta)$ is nearly maximal, namely $C_t$ takes the form \eug{Notation $p$ has never be defined... 
+%what if $\ee_t$ does not admit a density?}
+%\[C_t= \left\{ \theta \in \Theta\,:\, \tfrac{\prod_{s=1}^t p(y_s|x_s,\theta)}{\sup_{\theta' \in \Theta\prod_{s=1}^t 
+%p(y_s|x_s,\theta')}} \geq e^{-\beta_t}\right\}\,, \]
+%for some suitably defined $\beta_t$. 
+%In the standard linear stochastic problem that we have been discussing so far, it is well known that these confidence 
+%sets can be equivalently \eug{I don't like this \emph{equivalently}... If they were Gaussian it would be equivalent, but 
+%for sub-Gaussian it is a relaxation to use the Gaussian likelihood... Since we are only considering the sub-Gaussian 
+%case shan't we just put as form for $C_t$ the one with the quadratic loss?} written in terms of the squared loss defined 
+%as  $\ell_t(\theta) = \frac{1}{2}(\siprod{x_t}{\theta}-y_t)^2$. This gives raise to an ellipsoid centred around the 
+%\emph{maximum likelihood estimator} (MLE) at round $t$, $\wh\theta_t = \arg \min_{\theta \in \Theta} \LL_{t}(\theta)$, 
+%in the form  
+%\begin{equation}
+%\label{eq:ellipsoid}
+%    C_t = \big\{\theta \in \Theta, \LL_t(\theta)-\LL_t(\wh \theta_t) \leq \beta_t\big\}\,.
+%\end{equation}
+%
+%
+%Here, $\LL_t = \sum_{s=1}^t \ell_s$ denotes the cumulative loss over $t$ rounds, and  The coefficients $\beta_t$ dictate 
+%the width of the ellipsoids and need to be chosen in a way that ensure sequential coverage. In order to obtain a 
+%suitable choice, we will use an abstract online learning game which we present below. \eug{To be rewritten...}
+%%We will denotecorresponding to the loss function associated to the statistical model and naturally extends its 
+%% definition 
+%%with respect to the space of measure over $\Theta$ by denoting for $Q \in \Delta_{\Theta},$ $\ell_t(Q) := 
+%% -\log(\int\exp(-\ell_t(\theta))\mathrm{d}Q(\theta))$.
+%
+%Consider the following game between an online player and their environment. At each round $s= 1, 2, \dots, t$:
+%\begin{itemize}
+%
+%\item The environment reveals $x_s$ to the player;
+%\item The player picks $\theta_s\in\Theta$ (or more generally a distribution $p_s \in \Delta_\Theta$);
+%\item The environment reveals $y_s$ to the player;
+%\item The player incurs the loss $\ell_s(\theta_s)$.
+%\end{itemize}
+%Let us denote as $\Pi=(\theta_s)_{s=1\dots t}$ the sequence of parameters chosen by the online player. We define their 
+%regret with respect to a fixed comparator $\theta$ as
+%\[ \Regret_{\Pi,t}(\theta) = \sum_{s=1}^t \big(\ell_s( \theta)-\ell_s(\theta_s)\big)\,.\]
+%
+%By adding and subtracting the cumulative loss of the player, we can rewrite the excess log-likelihood of the true 
+%parameter $\theta^\star$,
+%relative to the MLE $\wh\theta_t$, as
+%\begin{equation}
+%\label{eq:regret+martingale}
+%    \LL_t(\theta^*)-\LL_t(\wh \theta_t)  
+%    = \underbrace{\sum_{s=1}^t \big(\ell_s(\theta_s)-\ell_s(\wh \theta_t)\big) }_{\text{regret term : 
+%}\Regret_{\Pi,t}(\wh \theta_t)}  + \underbrace{\sum_{s=1}^t 
+%\big(\ell_s(\theta^*)-\ell_s(\theta_t)\big)}_{M_t(\theta^*)\leq_{\delta} \log \frac{1}{\delta}}\,.
+%\end{equation}
+%
+%
+%The above decomposition is the first step to build our confidence sets. Note that the only assumption we make about the 
+%parameters chosen by the online player is that they are \textit{predictable}, which formally means that for any $s>1, 
+%\theta_s$ is $\F_{s-1}$-measurable where $\F_{s-1}:=\sigma(x_1,y_1,\dots,x_{s-1},y_{s-1},x_s)$. The regret term is a 
+%well-studied object in the online learning literature, with known tight/minimax upper bounds. On the other hand, one can 
+%easily notice that $M_t(\theta^*)$ is the log of a non-negative super-martingale (see Appendix \ref{app:NNSMG} for a 
+%detailed proof), and hence is small with high probability. More precisely, from Ville's inequality we have
+%\[\mathbb{P}\left( \exists t>0\,:\,M_t(\theta^*) \geq \log\tfrac{1}{\delta}\right) \leq \delta\,.\]
+%
+%Hence, defining for all $t\geq 1$
+% \begin{equation}
+%\label{eq:ConfidenceSequence}
+%    C_t(\delta)= \left\{\theta\,:\, \LL_{t}(\theta)-\LL_t(\wh \theta_{t}) \leq \Regret_{\Pi,t}(\wh \theta_{t})+\log 
+%\frac{1}{\delta}\right\}\,,
+%\end{equation} yields an anytime valid confidence sequence. Also note that in the above form $C_t(\delta)$ is an 
+%ellipsoid  centered at $\wh \theta_{t}$ with width $\beta_t(\delta)= \Regret_{\Pi,t}(\wh 
+%\theta_{t})+\log\frac{1}{\delta}.$
+%
+%
+%The best known bounds on this regret term are of order $\mathcal{O}(\max_{s \in [t]}y_s^2 p\log(t))$. The maximum 
+%squared label can be bounded by a constant times $\log(t)$, so we get $\mathcal{O}(p\log(t)^2)$. However, we would like 
+%the RHS to be of order $\mathcal{O}(p\log(t))$. We can remove the dependence on the max label by switching to randomised 
+%online learning algorithms, which return a sequence of distributions $Q_1, Q_2, \dots, $ on the set of parameter 
+%vectors. We naturally extend the definition of $\LL$ to $\Delta_\Theta$ where $\Delta_\Theta$ denote the set of 
+%probability distributions over $\Theta$ by denoting :
+%$$\mathcal{L}_s(Q) := -\log(\int\exp(-\ell_s(\theta))\mathrm{d}Q(\theta)).$$
+%We can then write
+%\begin{equation}
+%\sum_{s=1}^t\ell_s(\theta^*)-\ell_s(\wh \theta_t) = \underbrace{\sum_{s=1}^t \mathcal{L}_s(Q_s)-\ell_s(\wh \theta_t) 
+%}_{\text{regret term}}  + \underbrace{\sum_{s=1}^t \ell_s(\theta^*)-\mathcal{L}_s(Q_s)}_{\text{log non-negative 
+%martingale term}}\label{eqn:randomised_reg_plus_mart}
+%\end{equation}
+%
+%    As long as the distributions $(Q_s)_{s>1}$ are predictable w.r.t. $(\mathcal{F}_s)_{s>1}$, then the log martingale 
+%term is still the log of a non-negative supermartingale. If we let $M_t = \exp(\sum_{s=1}^{t}\ell_t(\theta^*) - 
+%\mathcal{L}_s(Q_s))$, then by using the fact that each $Q_s$ is $\mathcal{F}_{s-1}$-measurable,
+%\begin{align*}
+%\mathbb{E}[M_n|\mathcal{F}_{t-1}] &= M_{t-1}\mathbb{E}[\exp(\ell_t(\theta^*) - \mathcal{L}_t(Q_t))|\mathcal{F}_{t-1}]\\
+%&= M_{t-1}\mathbb{E}\left[\int\exp(\ell_t(\theta^*) - 
+%\ell_t(\theta))\mathrm{d}Q_t(\theta)\Big|\mathcal{F}_{t-1}\right]\\
+%&= M_{t-1}\int\mathbb{E}[\exp(\ell_t(\theta^*) - \ell_t(\theta))|\mathcal{F}_{t-1}]\mathrm{d}Q_n(\theta)\\
+%&\leq M_{t-1}\,,
+%\end{align*}
+%
+%where the last inequality follows from the proof of Lemma \ref{lemma:Concentration_SMG_classic} (which shows that 
+%$\mathbb{E}[\exp(\ell_t(\theta^*) - \ell_t(\theta))|\mathcal{F}_{t-1}] \leq 1$). \eug{Since it's in the appendix anyway 
+%I think we should just write it explicitly as a corollary...} The regret term is now the regret of $(Q_s)_{s \in [t]}$ 
+%in a problem called \emph{sequential probability assignment}. There are algorithms for sequential probability assignment 
+%that have regret of order $\mathcal{O}(p\log(t/p))$, which gives us a RHS with the right dependence on $p$ and $n$. In 
+%this setting, if we use the Exponentially Weighted Average (EWA) forecaster to generate $Q_1, Q_2, \dots$, then we can 
+%write down a closed-form expression for this regret term. The EWA forecaster (with learning rate 1) is defined by
+%\begin{equation*}
+%\frac{\mathrm{d}Q_t}{\mathrm{d}Q_1}(\theta) = \frac{\exp(-\sum_{s=1}^{t-1}\ell_s(\theta))}{\int 
+%\exp(-\sum_{s=1}^{t-1}\ell_s(\theta))\mathrm{d}Q_1(\theta)}\,.
+%\end{equation*}
+%
+%Since $\ell_t$ is the negative log likelihood (if the noise was actually Gaussian), this is equivalent to Bayesian 
+%linear regression. Using the definition of $Q_s$, we can write the total log loss as
+%\begin{align*}
+%\sum_{s=1}^{t}\mathcal{L}_s(Q_s) &= \sum_{s=1}^{t}-\log\int\exp(-\ell_s(\theta))\mathrm{d}Q_s(\theta)\\
+%&= \sum_{s=1}^{t}-\log\left(\frac{\int \exp(-\sum_{s=1}^{t}\ell_s(\theta))\mathrm{d}Q_1(\theta)}{\int 
+%\exp(-\sum_{s=1}^{t-1}\ell_s(\theta))\mathrm{d}Q_1(\theta)}\right)\\
+%&= -\log\int \exp\left(-\sum_{s=1}^{t}\ell_t(\theta)\right)\mathrm{d}Q_1(\theta)\,.
+%\end{align*}
+%
+%By subtracting $\sum_{s=1}^{t}\ell_s(\wh\theta_t)$ from both sides, we see that the regret term is
+%\begin{equation}
+%\sum_{s=1}^{t}\mathcal{L}_s(Q_s) - \sum_{s=1}^{t}\ell(\wh\theta_t) = -\log\int \exp\left(-\sum_{s=1}^{t}\ell_s(\theta) + 
+%\sum_{s=1}^{t}\ell_s(\wh\theta_t)\right)\mathrm{d}Q_1(\theta)\,.\label{eqn:ewa_regret}
+%\end{equation}
+%
+%If $Q_1$ is Gaussian, this integral can be evaluated using the Gaussian integral formula (see next section).
+
+
+\subsection{Confidence sequence under mixing sub-Gaussian noise}
+The standard online-to-confidence sets scheme relies on the fact that $\sum_{s=1}^t\ell_s(\theta^{\star}) - \sum_{s=1}^{t}\mathcal{L}_s(Q_s)$ is the logarithm of a non-negative super-martingale, whose fluctuations can be controlled uniformly in time thanks to Ville's inequality. However, this property hinges on the fact that the noise is assumed to be conditionally centred and sub-Gaussian, which now is not anymore the case. Yet, thanks to our mixing assumption, if we restrict our focus on rounds that are sufficiently far apart, the mutual dependencies get weaker, and the exponential of the sum behaves \emph{almost} like a martingale. This insight suggests to partition the rounds into blocks, whose elements are mutually far apart, then apply concentration results to each block, and finally use a union bound to recover the desired confidence sequence spanning all rounds. We remark that this is a classical approach to derive concentration results for mixing processes, often referred to as the \emph{blocking} technique \citep{yu1994rates}. 
+
+In order for the online-to-confidence sets scheme to leverage the blocking strategy outlined above, the abstract online game used for the analysis must be designed in a way that is compatible with the block structure. To address this point, we adopt an approach inspired by \cite{abeles2024generalization}, who introduced delays in the feedbacks received by the online learner in order to address a similar challenge. More precisely, we will now consider the following \emph{delayed-feedback} version of the online game. Fix a delay $d>0$. For each round $s = 1, \dots, t$, the following steps are repeated:
+\begin{enumerate}
+\item the environment reveals to the learner $X_s$, which is assumed to be $\F_{s-d}$-measurable;
+\item the learner plays a distribution $Q_s \in \Delta_{\mathbb{R}^p}$;
+\item if $s>d$, the environment reveals $Y_{s-d+1}$ to the learner;
+\item the learner suffers the log loss $\mathcal{L}_s(Q_s) = -\log\int_{\mathbb{R}^p}\exp(-\ell_s(\theta))\mathrm{d}Q_s(\theta)$.
+\end{enumerate}
+Note that the delay $d$ only applies for the rewards, while $Q_s$ can still depend on $X_s$. Indeed, the choice of $X_s$ in our mixing UCB algorithm is already ``delayed'', as it depends on $\C_{t-d}$ (see Algorithm \ref{alg::Mixing_LinUCB}).
+
+Of course, in this setting the decomposition of \eqref{eq:otc_dec} is still valid. We now want to deal with the concentration of $\sum_{s=1}^t\ell_s(\theta^{\star}) - \sum_{s=1}^{t}\mathcal{L}_s(Q_s)$ via the blocking technique. For convenience, let us write $D_t = \ell_t(\theta^\star) - \mathcal L_t(Q_t)$. We denote as $S^{(i)} = (S_k^{(i)})_{k\geq 1}$ the subsequence defined as $S_k^{(i)} = \sum_{j=1}^k D_{i+(j-1)d}$. The key idea is now that each of these $S^{(i)}$ behaves as the log of a martingale, up to a cumulative remainder that accounts for the conditional mean shift in the mixing sub-Gaussianity assumption. In particular, Ville's inequality and a union bound yield the following. 
+
+\begin{lemma}\label{lemma:conc}
+	Fix a delay $d>0$ and $\delta\in(0,1)$. We have that
+	$$\mathbb P\left(\sum_{s=1}^t\big(\ell_s(\theta^{\star}) - \mathcal{L}_s(Q_s)\big) \leq t\phi_d B + d\log\frac{d}{\delta}\,,\;\forall t\geq 1\right)\geq 1-\delta\,.$$
+\end{lemma}
+
+Now that we have a concentration result to control $S_t$, we only need to be able to upper bound the regret of an algorithm for the ``delayed'' online game that we are considering. To this purpose, we propose the following approach. We run $d$ independent EWA forecaster (with uniform prior), each one only making prediction and receiving the feedback once every $d$ rounds. More explicitly, the first forecaster acts at rounds $1$, $d+1$, $2d+1$..., the second at round $2$, $d+2$, $2d+2$..., and so on. As a direct consequence of Proposition \ref{pro:uniform_ewa_regret}, by summing the individual regret upper bounds we get a regret bound for the joint forecaster, which at each round returns the distribution predicted by the currently active forecaster. This technique of partitioning rounds into blocks for the regret analysis of online learning is common in the literature (\emph{e.g.}, see \citealp{weiberger2002delay}).
+
+\begin{lemma}\label{lemma:reg}
+Fix $B>0$, $d>0$, and consider a strategy with $d$ independent EWA forecasters outlined above, all initialised with the uniform distribution on $\mathcal B(B+1)$ as prior. For all $\bar{\theta}\in\mathcal B(B)$ and $t\geq 1$,
+\begin{equation*}
+\Regret_t(\bar{\theta}) \leq \frac{dp}{2}\log\frac{(B+1)^2e\max(dp,t+d)}{dp}\,.
+\end{equation*}
+\end{lemma}
+%We remark that this regret bound is essentially the same as what one would have obtained by replacing $t$ with $t/d$ in the bound of Proposition \ref{pro:uniform_ewa_regret}. 
+
+Putting together what we have, we get a confidence sequence suitable for our mixing UCB algorithm. 
+
+\begin{theorem}\label{thm:confseq}
+	Consider the setting introduced above. Fix $\delta\in(0,1)$ and a delay $d>0$. Assume as known that $\theta^\star\in\mathcal B(B)$. Let $\wh\theta_t = \argmin_{\theta\in\mathcal B(B)}\{\sum_{s=1}^{t}\ell_s(\theta)\}$ and $\Lambda_t = \sum_{s=1}^t X_s X_s^\top$. Define 
+	\begin{align*}\C_t = \Big\{\theta\in\mathcal B(B)\,:\,\tfrac{1}{2}\|\theta-\wh\theta_t\|_{\Lambda_t}^2&\leq \tfrac{dp}{2}\log\tfrac{(B+1)^2e\max(dp,t+d)}{dp} \\ &+ t\phi_d (B+1) + d\log\tfrac{d}{\delta}\Big\}.\end{align*}
+	Then, $(\C_t)_{t\geq 1}$ is an anytime valid confidence sequence for $\theta^\star$, namely
+	$$\mathbb P\big(\theta^\star\in\C_t\,,\;\forall t\geq 1\big)\leq 1-\delta\,.$$
+	%Here, $\mathcal B(B)$ denotes the closed Euclidean ball or radius $B$ in $\real^p$, $\wh\theta_t = \argmin_{\theta\in\mathcal B(B)}\{\sum_{s=1}^{t}\ell_s(\theta)\}$ is the constrained least square minimiser, and $\Lambda_t = \sum_{s=1}^t X_s X_s^\top$ is the \eug{what's the name of this?}.
+\end{theorem}
+\begin{proof}
+	The optimality of $\wh\theta_t$ implies $\sum_{s=1}^t\langle \theta-\wh\theta_t,\nabla\ell_s(\wh\theta_t)\rangle \geq 0$, for all $\theta\in\mathcal B(B)$. As  $\sum_{s=1}^t\ell_s$ is quadratic, it equals its second order Taylor expansion around $\wh\theta_t$ and its Hessian is everywhere $\Lambda_t$. So,
+	\begin{align*}\frac12\|\theta-\wh\theta_t\|_{\Lambda_t}^2 &\leq \frac12\|\theta-\wh\theta_t\|_{\Lambda_t}^2+\sum_{s=1}^t\big\langle \theta-\wh\theta_t,\nabla\ell_s(\wh\theta_t) \big\rangle\\
+    &= \sum_{s=1}^t \big(\ell_s(\theta)-\ell_s(\wh\theta_t)\big)\,,\end{align*} for any $\theta\in\mathcal B(B)$. This, together with \eqref{eq:otc_dec}, Lemma \ref{lemma:conc}, and Lemma \ref{lemma:reg}, yields the conclusion.
+\end{proof}
+We remark that the confidence sets of Theorem \ref{thm:confseq} take the form of the intersection between the ball $\mathcal B(B)$ and the ``ellipsoid'' $\{\theta:\|\theta-\wh\theta_t\|_{\Lambda_t}\leq\beta_t\}$, for a suitable radius $\beta_t$. In order to implement and analyse the bandit algorithm, it will be more convenient to work with a relaxation of these sets, a pure ellipsoid not intersected with $\mathcal B(B)$. We make this explicit in the following corollary.
+\begin{corollary}\label{cor:conf}
+	Fix $\lambda>0$, $d>0$, and $\delta\in(0,1)$. For $t\geq 1$, let $V_t = \Lambda_t + \lambda\mathrm{Id}$. Assuming that $\theta^\star\in\mathcal B(B)$, the following compact ellipsoids define an anytime valid confidence sequence for $\theta^\star$:
+	\begin{align*}\mathcal\C_t = \Big\{\theta\in\mathcal B(B)\,:\,&    \tfrac{1}{2}\|\theta-\wh\theta_t\|_{V_t}^2\leq \tfrac{dp}{2}\log\tfrac{(B+1)^2e\max(dp,t+d)}{dp} \\&+ 2\lambda B^2 + t\phi_d (B+1) + d\log\tfrac{d}{\delta}\Big\}\,.\end{align*}
+\end{corollary}
+\begin{proof}
+	Let $\beta_t^2 = dp\log\tfrac{(B+1)^2e\max(dp,t+d)}{dp} + 2t\phi_d (B+1) + 2d\log\tfrac{d}{\delta}$. From Theorem \ref{thm:confseq}, with probability at least $1-\delta$, uniformly for every $t$, $\|\theta^\star-\wh\theta_t\|_{\Lambda_t}^2\leq\beta_t^2$. Adding to both sides of this inequality $\frac{\lambda}{2}\|\theta^\star-\wh\theta_t\|_2^2$, and relaxing the RHS using that $\|\theta^\star-\wh\theta_t\|_2^2\leq 4 B^2$, we conclude.
+\end{proof}
+
+
+%Define $\wh\theta_t = \argmin_{\|\theta\|_2 \leq B}\{\sum_{s=1}^{t}\ell_s(\theta)\}$ to be the constrained ERM. Fix $\delta\in(0,1)$, $\lambda>0$, and let $V_t = \sum_{s=1}^t X_s X_s^\top + \lambda\mathrm{Id}$. Define
+%\begin{equation*}
+%\mathcal{C}_t = \left\{\theta \in \mathbb{R}^p: \|\theta - \wh\theta_t\|_{V_t}^2 \leq p\log\tfrac{(B+1)^2e\max(p,t)}{p} + 2\lambda B^2 + 2\log\tfrac{1}{\delta}\right\}\,.
+%\end{equation*}
+%Then, the sequence $(\C_t)_{t\geq 0}$ is a confidence sequence for $\theta^\star$, namely $$\mathbb{P}\big(\theta^{\star} \in \mathcal{C}_t\,,\;\forall t\geq 1\big) \geq 1 - \delta\,.$$
+
+%We can now study the concentration of $S^{(i)}$, which as mention before will almost behave as a martingale, as it only consider rounds at least $d$-far apart. 
+
+%\eug{rename the filtration or check is the same we mentioned earlier on...}
+%Let us define the filtration $(\mathcal F_k^{d,i})_{k\geq 1} = \sigma(X_1,\dots,X_{kd+i}, Y_1,\dots, Y_{(k-1)d + i})$. 
+
+
+
+
+
+

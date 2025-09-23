@@ -1,0 +1,210 @@
+\documentclass[twoside]{article}
+
+\usepackage{aistats2026}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{prop}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{assumption}{Assumption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{diagbox}
+\usepackage{footnote}
+\usepackage{natbib}
+\usepackage{tikz}
+\usepackage{cancel}
+\usepackage{cleveref}
+\bibliographystyle{unsrtnat}
+\input{bmacros}
+\newcommand{\ee}{\varepsilon}
+\newcommand{\ucb}{\mathrm{UCB}}
+\newcommand{\Reg}{\mathrm{Reg}}
+
+
+% If your paper is accepted, change the options for the package
+% aistats2026 as follows:
+%
+%\usepackage[accepted]{aistats2026}
+%
+% This option will print headings for the title of your paper and
+% headings for the authors names, plus a copyright note at the end of
+% the first column of the first page.
+
+% We also include a `preprint' option for non-anonymous preprints. 
+% Change the options for the package aistats2026 as follows:
+%
+%\usepackage[preprint]{aistats2026}
+%
+% This option will print headings for the title of your paper and
+% headings for the authors names, but does not print the copyright and 
+% venue note at the end of the first column of the first page.
+
+% If you set papersize explicitly, activate the following three lines:
+%\special{papersize = 8.5in, 11in}
+%\setlength{\pdfpageheight}{11in}
+%\setlength{\pdfpagewidth}{8.5in}
+
+% If you use the natbib package, activate the following three lines:
+%\usepackage[round]{natbib}
+%\renewcommand{\bibname}{References}
+%\renewcommand{\bibsection}{\subsubsection*{\bibname}}
+
+% If you use BibTeX in apalike style, activate the following line:
+%\bibliographystyle{apalike}
+
+\begin{document}
+
+% If your paper is accepted and the title of your paper is very long,
+% the style will print as headings an error message. Use the following
+% command to supply a shorter title of your paper so that it can be
+% used as headings.
+%
+%\runningtitle{I use this title instead because the last one was very long}
+
+% If your paper is accepted and the number of authors is large, the
+% style will print as headings an error message. Use the following
+% command to supply a shorter version of the author names so that
+% they can be used as headings (for example, use only the surnames)
+%
+%\runningauthor{Surname 1, Surname 2, Surname 3, ...., Surname n}
+
+\twocolumn[
+
+\aistatstitle{Linear Bandits with Non-i.i.d. Noise}
+
+\aistatsauthor{ Baptiste Abeles \And Eugenio Clerico  \And Hamish Flynn \And Gergely Neu }
+
+\aistatsaddress{ Universitat Pompeu Fabra} ]
+
+
+\begin{abstract}
+ We study the linear stochastic bandit problem, relaxing the standard i.i.d.~assumption on the observation noise. 
+As an alternative to this restrictive assumption, we allow the noise terms across rounds to be sub-Gaussian but 
+interdependent, with dependencies that decay over time. To address this setting, we develop new confidence sequences 
+using a recently introduced reduction scheme to sequential probability assignment, and use these to derive a bandit 
+algorithm based on the principle of optimism in the face of uncertainty. We provide regret bounds for the 
+resulting algorithm, expressed in terms of the decay rate of the strength of dependence between observations. Among 
+other results, we show that our bounds recover the standard rates up to a factor of the mixing time for geometrically 
+mixing observation noise.
+\end{abstract}
+
+
+\input{Introduction}
+\input{Preliminaries}
+\input{Mixing_Bandit}
+\input{confidence_set}
+\input{Regret_analysis}
+\input{Conclusion}
+\subsubsection*{Acknowledgements}
+This project has received funding from the European Research Council (ERC), under the European Union’s Horizon 2020 research and in- novation programme (Grant agreement No. 950180).
+
+
+\subsubsection*{References}
+
+References follow the acknowledgements. Use an unnumbered third level
+heading for the references section.  Please use the same font
+size for references as for the body of the paper---remember that
+references do not count against your page length total.
+
+\begin{thebibliography}{}
+\setlength{\itemindent}{-\leftmargin}
+\makeatletter\renewcommand{\@biblabel}[1]{}\makeatother
+\bibitem{} J.~Alspector, B.~Gupta, and R.~B.~Allen (1989).
+    \newblock Performance of a stochastic learning microchip.
+    \newblock In D. S. Touretzky (ed.),
+    \textit{Advances in Neural Information Processing Systems 1}, 748--760.
+    San Mateo, Calif.: Morgan Kaufmann.
+
+\bibitem{} F.~Rosenblatt (1962).
+    \newblock \textit{Principles of Neurodynamics.}
+    \newblock Washington, D.C.: Spartan Books.
+
+\bibitem{} G.~Tesauro (1989).
+    \newblock Neurogammon wins computer Olympiad.
+    \newblock \textit{Neural Computation} \textbf{1}(3):321--323.
+\end{thebibliography}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Checklist}
+
+
+% %%% BEGIN INSTRUCTIONS %%%
+The checklist follows the references. For each question, choose your answer from the three possible options: Yes, No, Not Applicable.  You are encouraged to include a justification to your answer, either by referencing the appropriate section of your paper or providing a brief inline description (1-2 sentences). 
+Please do not modify the questions.  Note that the Checklist section does not count towards the page limit. Not including the checklist in the first submission won't result in desk rejection, although in such case we will ask you to upload it during the author response period and include it in camera ready (if accepted).
+
+\textbf{In your paper, please delete this instructions block and only keep the Checklist section heading above along with the questions/answers below.}
+% %%% END INSTRUCTIONS %%%
+
+
+\begin{enumerate}
+
+  \item For all models and algorithms presented, check if you include:
+  \begin{enumerate}
+    \item A clear description of the mathematical setting, assumptions, algorithm, and/or model. [Yes/No/Not Applicable]
+    \item An analysis of the properties and complexity (time, space, sample size) of any algorithm. [Yes/No/Not Applicable]
+    \item (Optional) Anonymized source code, with specification of all dependencies, including external libraries. [Yes/No/Not Applicable]
+  \end{enumerate}
+
+  \item For any theoretical claim, check if you include:
+  \begin{enumerate}
+    \item Statements of the full set of assumptions of all theoretical results. [Yes/No/Not Applicable]
+    \item Complete proofs of all theoretical results. [Yes/No/Not Applicable]
+    \item Clear explanations of any assumptions. [Yes/No/Not Applicable]     
+  \end{enumerate}
+
+  \item For all figures and tables that present empirical results, check if you include:
+  \begin{enumerate}
+    \item The code, data, and instructions needed to reproduce the main experimental results (either in the supplemental material or as a URL). [Yes/No/Not Applicable]
+    \item All the training details (e.g., data splits, hyperparameters, how they were chosen). [Yes/No/Not Applicable]
+    \item A clear definition of the specific measure or statistics and error bars (e.g., with respect to the random seed after running experiments multiple times). [Yes/No/Not Applicable]
+    \item A description of the computing infrastructure used. (e.g., type of GPUs, internal cluster, or cloud provider). [Yes/No/Not Applicable]
+  \end{enumerate}
+
+  \item If you are using existing assets (e.g., code, data, models) or curating/releasing new assets, check if you include:
+  \begin{enumerate}
+    \item Citations of the creator If your work uses existing assets. [Yes/No/Not Applicable]
+    \item The license information of the assets, if applicable. [Yes/No/Not Applicable]
+    \item New assets either in the supplemental material or as a URL, if applicable. [Yes/No/Not Applicable]
+    \item Information about consent from data providers/curators. [Yes/No/Not Applicable]
+    \item Discussion of sensible content if applicable, e.g., personally identifiable information or offensive content. [Yes/No/Not Applicable]
+  \end{enumerate}
+
+  \item If you used crowdsourcing or conducted research with human subjects, check if you include:
+  \begin{enumerate}
+    \item The full text of instructions given to participants and screenshots. [Yes/No/Not Applicable]
+    \item Descriptions of potential participant risks, with links to Institutional Review Board (IRB) approvals if applicable. [Yes/No/Not Applicable]
+    \item The estimated hourly wage paid to participants and the total amount spent on participant compensation. [Yes/No/Not Applicable]
+  \end{enumerate}
+
+\end{enumerate}
+
+
+
+\clearpage
+\appendix
+\thispagestyle{empty}
+
+% Supplementary material: To improve readability, you must use a single-column format for the supplementary material.
+\onecolumn
+\input{Appendix}
+
+
+\bibliography{biblio}
+
+
+
+\end{document}

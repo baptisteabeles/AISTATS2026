@@ -1,0 +1,161 @@
+
+
+\section{Technical Appendices and Supplementary Material}
+
+\subsection[Proof of Proposition 2]{Proof of Proposition \ref{pro:uniform_ewa_regret}}\label{app:prop2}
+For the EWA forecaster with prior $Q_1$, we can rewrite the regret via a standard telescoping argument (see Lemma B.1 in \citealp{clerico2025confidence}) as 
+$$\Regret_t(\bar{\theta}) = -\log\int\exp\left(-\sum_{s=1}^{t}\ell_s(\theta) + \sum_{s=1}^{t}\ell_s(\bar{\theta})\right)\mathrm{d}Q_1(\theta)\,.$$
+Using the variational representation of the KL divergence, this can be upper bounded as
+\begin{align*}
+\Regret_t(\bar{\theta}) &= \inf_{Q}\left\{\int\sum_{s=1}^{t}\ell_s(\theta)\mathrm{d}Q(\theta) - \sum_{s=1}^{t}\ell_s(\bar{\theta}) + D_{\mathrm{KL}}(Q||Q_1)\right\}\\
+&\leq \inf_{c \in (0, 1]}\left\{\int\sum_{s=1}^{t}\ell_s(\theta)\mathrm{d}P_c(\theta) - \sum_{s=1}^{t}\ell_s(\bar{\theta}) + D_{\mathrm{KL}}(P_c||Q_1)\right\}\,,
+\end{align*}
+
+where $P_c$ is the uniform measure on the closed Euclidean ball of radius $c$ in $\real^p$, centred at $\bar\theta$. We remark that for all $c \in (0, 1]$, $P_c\ll Q_1$. Therefore, for all $c \in (0, 1]$,
+\begin{equation*}
+D_{\mathrm{KL}}(P_c||Q_1) = \int p\log\frac{B+1}{c}\mathrm{d}Q_1(\theta) = p\log\frac{B+1}{c}\,.
+\end{equation*}
+
+Taking a second-order Taylor expansion of the total squared loss around $\bar{\theta}$, and using the fact that the mean of $P_c$ is $\bar{\theta}$, we obtain
+\begin{align*}
+\sum_{s=1}^{t}\int_{\real^p}\big(\ell_s(\theta)-\ell_s(\bar{\theta})\big)\mathrm{d}P_c(\theta) &= \sum_{s=1}^t\int_{\real^p}\left(\iprod{\theta - \bar{\theta}}{\nabla\ell_s(\bar{\theta})} + \tfrac{1}{2}\iprod{\theta - \bar{\theta}}{X_s}^2\right)\mathrm{d}P_c(\theta) \leq \frac{tc^2}{2}\,,
+\end{align*}
+where we used that $\|X_s\|_2\leq 1$ for all $s$ in the last inequality. Combining everything so far, we obtain
+\begin{equation*}
+\Regret_t(\bar{\theta}) \leq \inf_{c \in (0, 1]}\left\{p\log\frac{B+1}{c} + \frac{tc^2}{2}\right\} \leq \frac{p}{2}\log\frac{(B+1)^2e\max(p, t)}{p}\,,
+\end{equation*}
+where the last term is obtained taking $c = \min(1, \sqrt{p/t})$.
+
+\subsection[Proof of Lemma 1]{Proof of Lemma \ref{lemma:conc}}
+Let $D_t = \ell_t(\theta^\star) - \mathcal L_t(Q_t)$ and $\lambda_t(\theta) = \langle \theta -\theta^\star, X_t\rangle$. It is easy to check that
+$$D_t = \log\int e^{\lambda_t(\theta)\ee_t - \lambda_t(\theta)^2/2}\dd Q_t(\theta)\,.$$
+
+
+Fix $i\in \{1,\dots, d\}$. We denote as $S^{(i)} = (S_k^{(i)})_{k\geq 1}$ the subsequence defined as $S_k^{(i)} = \sum_{j=1}^k D_{i+(j-1)d}$. We also define $\F^{(i)}_k = \F_{i+(k-1)d}$. It is easy to check that $(S_k^{(i)})_{k\geq 1}$ is adapted with respect to $(\F^{(i)}_k)_{k\geq 1}$. Now, let $M^{(i)}_k = \exp (S_k^{(i)} - (k-1)(2B+1)\phi_d)$. We will show that $(M^{(i)}_k)_{k\geq1}$ is a super-martingale with respect to $(\F^{(i)}_k)_{k\geq 1}$, with initial expectation bounded by $1$. For this it is enough to show that for any $k\geq 1$ we have $\E[e^{D_{i+(k-1)d}-(2B+1)\phi_d}|\F^{(i)}_{k-1}] \leq 1$. This is true for $k=1$ (where we let $\F^{(i)}_0$ be the trivial $\sigma$-field, or more generally a $\sigma$-field independent of the noise). Indeed, as $i\leq d$, $X_i$ is $\F_0$ measurable and hence independent of $\ee_i$. From Assumption \ref{ass:mixing-subgaussianity}, we know that $\ee_i$ is sub-Gaussian, and so $\E[e^{D_i}]\leq 1$. 
+
+Let us now check the case $k\geq 2$. For convenience, we define $t_k^{(i)} = i + (k-1)d$. We note that $\F_{t_k^{(i)}} = \F_k^{(i)}$. We have
+\begin{align*}\E[e&^{D_{i+(k-1)d}-(2B+1)\phi_d}|\F^{(i)}_{k-1}] \\&\qquad= \E\left[\int \exp\big(\lambda_{t_k^{(i)}}(\theta)\ee_{t_k^{(i)}} - \lambda_{t_k^{(i)}}(\theta)^2/2 - (2B+1)\phi_d\big)\mathrm dQ_{t_k^{(i)}}(\theta)\middle|\F_{k-1}^{(i)}\right]\,.\end{align*}
+Now, $Q_{t_k^{(i)}}$ only depends on the noise up to $\ee_{t_k^{(i)}-d} = \ee_{t_{k-1}^{(i)}}$, thanks to the delayed bandit framework. Henceforth, we can swap the conditional expectation and the integral. In a similar way, we can bring $\exp\big( - \lambda_{t_k^{(i)}}(\theta)^2/2 - (2B+1)\phi_d\big)$ outside of the conditional expectation, as it is $\F_{k-1}^{(i)}$ measurable. We get 
+\begin{align*}
+	\E[e&^{D_{i+(k-1)d}-(2B+1)\phi_d}|\F^{(i)}_{k-1}] \\&= \int \E\left[\exp\big(\lambda_{t_k^{(i)}}(\theta)\ee_{t_k^{(i)}}\big) \middle|\F_{k-1}^{(i)}\right]\exp\big(- \lambda_{t_k^{(i)}}(\theta)^2/2 - (2B+1)\phi_d\big)\mathrm dQ_{t_k^{(i)}}(\theta)\\
+	&\leq \int \exp\big(\lambda_{t_k^{(i)}}(\theta)^2/2 + \lambda_{t_k^{(i)}}\E[\ee_{t_k^{(i)}}|\F_{k-1}^{(i)}]\big)\exp\big(- \lambda_{t_k^{(i)}}(\theta)^2/2 - (2B+1)\phi_d\big)\mathrm dQ_{t_k^{(i)}}(\theta)\\
+	&\leq \int \exp\big(\big|\lambda_{t_k^{(i)}}(\theta)\big|\phi_d - (2B+1)\phi_d\big)\mathrm dQ_{t_k^{(i)}}(\theta)\,,
+\end{align*}
+where the two inequalities use the sub-Gaussianity and mixing properties of Assumption \ref{ass:mixing-subgaussianity}. Now, by construction $Q_{t_k^{(i)}}$ has support on $\mathcal B(B+1)$, and for every $\theta\in\mathcal B(B+1)$ $$\big|\lambda_{t_k^{(i)}}(\theta)\big| \leq \|\theta-\theta^\star\|_2\|X_{t_k^{(i)}}\|_2\leq 2B+1\,,$$ where we also used that $\|X_{t_k^{(i)}}\|_2\leq 1$, as for all $t$ we are assuming that $\X_t\subseteq\mathcal B(1)$. We thus conclude that $(M_k^{(i)})_{k\geq 1}$ is indeed a super-martingale, non-negative and with initial value bounded by $1$. By Ville's inequality it follows that 
+$$\mathbb P\big(S_k^{(i)}\leq k(2B+1)\phi_d +\log\tfrac{d}{\delta}\,,\;\forall k\geq 1\big)\geq 1-\tfrac{\delta}{d}\,.$$
+Now that we have proven that we have a super-martingale for each block, the desired anytime valid concentration result follows directly from a simple union bound. 
+
+\subsection[Proof of Lemma 2]{Proof of Lemma \ref{lemma:reg}}
+Fix $t\geq 1$, and let $i\in\{1,\dots,d\}$ and $k\geq 1$ be such that $t = i + (k-1)d$. Let $I_j = \{j+d\mathbb N\}\cap \{1,\dots, t\}$, for $j\in\{1,\dots d\}$. We consider $d$ independent EWA forecaster (all initialised with the uniform prior on $\mathcal B(B+1)$). The $j$\textsuperscript{th} forecaster only acts and receive feedback from the rounds in $I_j$. We note that the $j$\textsuperscript{th} forecaster acts for $t_j$ rounds, where $t_j = k$ if $j\geq i$, and $t_j=k-1$ otherwise. We denote as $R^{(j)}$ the regret of the $j$\textsuperscript{th} forecaster (which only takes into account the losses at the rounds in $I_j$, with comparator $\bar\theta$. By Proposition \ref{pro:uniform_ewa_regret} we get 
+$$\Regret_t(\bar\theta) = \sum_{j=1}^d R^{(j)}\leq \sum_{j=1}^d \frac{p}{2}\log\frac{(B+1)^2e\max(p,t_j)}{p}\,.$$
+We conclude by noticing that, for all $j$, $t_j\leq (t+d)/d$. 
+
+
+
+
+
+
+\subsection{Proof of Lemma \ref{lem:delay_elliptical}}
+\label{proof:delay_elliptical}
+We recall the standard Elliptical Potential Lemma (see e.g.\ Lemma 11 in \citealp{abbasi2011improved}), which we will use in our proof of \Cref{lem:delay_elliptical}.
+
+\begin{lemma}[Elliptical Potential Lemma]
+\label{lemma:elliptical_potential}
+Let $(X_t)_t$ be any sequence of vectors in $\mathbb{R}^p$ satisfying $\max_{t \in [T]}\|X_t\|_2 \leq L$ and let $V_T = \sum_{t=1}^{T}X_tX_t^{\top} + \lambda I$, for some $\lambda > 0$. Then
+\begin{equation*}
+\sum_{t=1}^{T}\min(1, \|X_t\|_{V_{t-1}^{-1}}^2) \leq 2p\log(1 + \tfrac{TL^2}{\lambda p})\,.
+\end{equation*}
+\end{lemma}
+
+
+Next, we introduce some notation. For $t>d$, define $(i(t),k(t)) \in [d]\times[K]$ such that $t=i(t) +k(t)d$ and let $$V_{k(t)-1}^{i(t)}=\sum_{k=0}^{k(t)-1}X_{k}^{i(t)}(X_{k}^{i(t)})^{\top}+\lambda \mathrm{Id}\,, $$ 
+where $X_{k}^{i(t)}=X_{i(t)+kd}$. With this notation, we can state the following lemma.
+
+\begin{lemma}
+    For any $t>d$, we have 
+    \[V_{t-d} 
+\succcurlyeq V_{k(t)-1}^{i(t)}\,, \]
+which implies that $ \norm{X_t}_{V_{t-d}^{-1}}^2 \leq \norm{X_t}_{\pa{V_{k(t)-1}^{i(t)}}^{-1}}^2$ for any $t>d$.
+\label{lem:loewner}
+\end{lemma}
+\begin{proof}
+    Notice that we can write $V_{t-d} = \sum_{s=1}^{t-d}X_sX_s^{\top} + \lambda\mathrm{Id}=V_{k(t)}^{i(t)}+\sum_{s=1,s\notin S_t}^{t-d}X_sX_s^{\top}$ 
+where $S_t := \{ s = i(t) + (k-1)d, k \in [k(t)] \}$ is the set of indices $(i(t), i(t)+d,\dots, i(t)+(k(t)-1)d)$. The statement now follows from the fact that $\sum_{s=1,s\notin S_t}^{t-d}X_sX_s^{\top} \succcurlyeq 0$. 
+\end{proof}
+
+We are now ready to prove Lemma \ref{lem:delay_elliptical}. For now, let us assume that $T = Kd$, for some $K > 1$. Using \Cref{lem:loewner} and then \Cref{lemma:elliptical_potential}, we have
+\begin{align*}
+\sum_{t=d+1}^{T}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2) &\leq \sum_{t=d+1}^{T}\min(1, \|X_{k(t)}^{i(t)}\|_{(V_{k(t)-1}^{i(t)})^{-1}}^2)\\
+&= \sum_{i=1}^{d}\sum_{k=1}^{K-1}\min(1, \|X_{k}^{i}\|_{(V_{k-1}^{i})^{-1}}^2)\\
+&\leq 2dp\log(1 + \tfrac{(K-1)L^2}{\lambda p})\,.
+\end{align*}
+
+One can verify that if $T$ is not divisible by $d$, the above inequality still holds if we replace $K$ by $\lceil\frac{T}{d}\rceil$. Therefore, regardless of whether $T$ is divisible by $d$, we have
+\begin{equation*}
+\sum_{t=d+1}^{T}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2) \leq 2dp\log(1 + \tfrac{TL^2}{\lambda dp})\,.
+\end{equation*}
+
+This concludes the proof of \Cref{lem:delay_elliptical}.
+
+%We notice that 
+%$\norm{X_t}_{\pa{V_{k(t)-1}^{i(t)}}^{-1}}^2 = \norm{X_{k(t)}^{i(t)}}_{\pa{V_{k(t)-1}^{i(t)}}^{-1}}^2$  and thus we can apply Lemma \ref{lemma:elliptical_potential} which for any $t>d$ yields
+%\begin{equation*}
+%\sum_{k=1}^{k(t)}\min(1, \|X_k^{i(t)}\|_{\left(V_{k-1}^{i(t)}\right)^{-1}}^2)  \leq 2p\log(1 + \tfrac{k(t)L^2}{\lambda p})\,.
+%\end{equation*}
+%
+%Finally denote $K$ such that $T=Kd$ (for simplicity) we have,
+%\begin{align*}
+%    \sum_{t=d+1}^{T}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2) &\leq \sum_{t=1}^T\min(1, \|X_{k(t)}^{i(t)}\|_{(V_{k(t)-1}^{i(t)})^{-1}}^2) \\
+%    &\leq 2dp\log(1 + \tfrac{KL^2}{\lambda p}).
+%\end{align*}
+%finally replacing $K$ by $\frac{T}{d}$ yields the final result. 
+%Also note that the restriction $T=Kd$ serves to simplify notations and is not problematic since in the regret analysis if $T=Kd+r$ we can bound the final part the same way we bound the first $d$ steps of the algorithm since $d$ is always assumed to be negligible with respect to $T$.
+\subsection{Proof of Corollary \ref{cor:geometric_mixing} and Corollary \ref{cor:algebraic_mixing}}
+We start by recalling the general result
+\begin{equation}
+\label{eq:general_regret}
+\Reg(T)  = \mathcal{O}\left(\underbrace{dB}_{(1)} + \underbrace{dp\sqrt{T}\log\tfrac{TB}{dp}}_{(2)} + \underbrace{T\sqrt{Bdp\phi_d\log\tfrac{TB}{dp}}}_{(3)} + \underbrace{d\sqrt{pT\log\tfrac{TB}{p\delta}}}_{(4)}\right)\,.
+\end{equation}
+
+To simplify the following calculations, we do not force $d$ to be a positive integer. One can always round $d$ without changing the rates of the regret bounds.
+
+\textbf{Geometric Mixing:}
+
+Assume $d= \tau \log \frac{BCT}{p}$. We notice that the term $(1)$ is logarithmic in $T$ and thus negligible. From the definition of geometric mixing, it holds that $\phi_d = Ce^{-\frac{d}{\tau}}=\frac{p}{BT}.$ Therefore, \[(3) \leq p\sqrt{\tau  T}\log\frac{TB}{p}\,.\] Substituting the value of $d$ yields the desired bounds for terms $(2)$ and $(4)$ in Equation \ref{eq:general_regret}, and hence the desired statement.
+
+\textbf{Algebraic mixing:}
+
+Assume $d =  CT^{\frac{1}{1+r}}$, we notice that in this case since $\phi_d = Cd^{-r},$ we have $d\phi_d = Cd^{1-r}$. In particular this implies that $T\sqrt{d\phi_d} = T^{\frac{3+r}{2(1+r)}}$ and thus
+\[(3)\leq C\sqrt{Bp\log\frac{TB}{p}}T^{\frac{3+r}{2(1+r)}}\]
+The same way $(2)$ and $(4)$ are of order $d\sqrt{T}= T^{\frac{3+r}{2(1+r)}}$ and replacing in Equation \ref{eq:general_regret} yields the desired statement.
+
+
+
+
+\subsection{Proof of Corollary \ref{cor:gap_reg_geo} and Corollary \ref{cor:gap_reg_alg}}
+\label{proof:cor2}
+We start by recalling the general result
+\begin{align*}
+\Reg(T) \leq 2dB + \frac{8dp}{\Delta}\max(B^2, \beta_{T}^2)\log\left(1 + \frac{B^2T}{dp}\right)\,,
+\end{align*}
+where $\beta_T^2 = \underbrace{dp\log\tfrac{(B+1)^2e\max(dp,T+d)}{dp}}_{(1)} + \underbrace{2T\phi_d (B+1)}_{(2)} + \underbrace{2d\log\tfrac{d}{\delta}}_{(3)}$.
+
+\textbf{Geometric Mixing:}
+
+Assume $d= \tau \log \frac{BCT}{p}$, then $(2)=\frac{2p(B+1)}{BC}$ is a constant.  Hence we have \[ \Reg(T)\leq 2dB + \frac{8d^2p}{\Delta}\left(p\log\tfrac{(B+1)^2e\max(dp,T+d)}{dp}+2\log \frac{d}{\delta}+ \frac{2p(B+1)}{dBC} \right)\log\left(1 + \frac{B^2T}{dp}\right), \]
+which under the assumption that $\beta_T \geq B$ and replacing $d$ by its definition yields
+\begin{align*}
+\Reg(T) &\leq 2B\tau \log \frac{BCT}{p}\\
+&+ \frac{8\tau^2p}{\Delta}\log\left(1 + \frac{B^2T}{p\tau \log \frac{BCT}{p}}\right)\left(\left(\log\frac{BCT}{p}\right)^2 \left(p\log\tfrac{(B+1)^2eT}{p}+2\tau\frac{\log \frac{BCT}{p}}{\delta}\right)+\frac{2p(B+1)}{BC}\right)\,.
+\end{align*}
+
+If $\Delta$ is constant, then for large $T$, the first term and the constant part coming from $(2)$ become negligible. Therefore,
+\[\Reg(T) = \OO\left(\frac{8\tau^2p}{\Delta}\log\left(1 + \frac{B^2T}{p\tau \log \frac{BCT}{p}}\right)\left(\log\frac{BCT}{p}\right)^2 \left(\frac{p}{2}\log\tfrac{(B+1)^2eT}{p}+\tau\frac{\log \frac{BCT}{p}}{\delta}\right)\right)\]
+
+\textbf{Algebraic mixing:}
+
+Assume $d =  CT^{\frac{1}{1+r}}$, then we have
+\[\beta_T^2 \leq CT^{\frac{1}{1+r}}\log \frac{(B+1)^2eT}{p} + 2C(B+1)T^{\frac{2}{1+r}} + 2C T^{\frac{1}{1+r}}\log\frac{C T^{\frac{1}{1+r}}}{\delta}.\]
+
+Under the regime where $2dB \le \frac{8dp}{\Delta}\max(B^2, \beta_{T}^2)\log\left(1 + \frac{B^2T}{dp}\right)$ and $B\le \beta_T$ this leads to 
+\[\Reg(T) =\OO\left( \frac{8Cp}{\Delta}T^{\frac{2}{1+r}}\log\left(1 + \frac{B^2T}{pCT^{1/(1+r)}}\right)\left(\frac{p}{2}\log\frac{(B+1)^2eT}{p}+\log \frac{CT^{1/(1+r)}}{\delta}\right)\right)\,.\]

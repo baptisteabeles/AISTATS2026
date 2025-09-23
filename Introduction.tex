@@ -1,0 +1,85 @@
+\section{Introduction}
+The linear bandit problem \citep{abe1999associative, auer2003using} is an instance of a multi-armed bandit framework, 
+where the expected reward is linear in the feature vector representing the chosen arm. More concretely, it is a 
+sequential decision-making problem, where an agent each round picks an arm $X_t$, and receives a reward $Y_t = 
+\siprod{\theta^\star}{X_t} + \ee_t$, with $\theta^\star$ a fixed parameter unknown to the agent, and $\ee_t$ zero-mean 
+random noise. This framework has gained significant attention in the literature as it yields analytic tools that can be 
+applied to several concrete applications, such as online advertising \citep{abe2003reinforcement}, recommendation 
+systems \citep{li2010contextual, korkut2021disposable}, and dynamic pricing \citep{cohen2020feature}. 
+
+A popular strategy to tackle linear bandits leverages the principle of \emph{optimism in the face of uncertainty}, via 
+upper confidence bound (UCB) algorithms. The idea of optimism can be traced back to \citet{lai1985asymptotically}, and 
+its application to linear bandits was already advanced by \citet{auer2003using}. Since then, this approach has been 
+improved and analysed by several works \citep{abbasi2011improved, lattimore2020bandit, flynn2023improved}. This class of 
+methods requires constructing an adaptive sequence of confidence sets that, with high probability, contain the true 
+parameter $\theta^\star$. Each round, the agent selects the arm maximising the expected reward under the most optimistic 
+parameter (in terms of reward) in the current confidence set. UCB-based algorithms have become popular as they are often 
+easy to implement and come with tight worst-case regret guarantees. 
+
+For a UCB algorithm to perform well, it is necessary that the confidence sets are tight, which can be ensured by taking 
+advantage of the structure of the problem. In this paper, our focus is on studying various assumptions on the 
+observation noise. A commonly studied situation is when $(\ee_t)_{t\geq 0}$ consists of a sequence of 
+i.i.d.~realisations of some bounded or sub-Gaussian random variable (see \citealp{lattimore2020bandit}, Chapter 20). 
+Often, the standard analysis can be extended to the case in which the realisation are not independent, but conditionally 
+centred and sub-Gaussian \citep{abbasi2011improved}. Yet, in real-world settings, this assumption is often unrealistic, 
+as one can expect the presence of interdependencies among the noise at different rounds. For instance, in the context of 
+advertisement selection, the noise models the ensemble of external factors that influence the user's choice on whether 
+to click or not an ad. The i.i.d.~assumption implies that across different rounds these external factors are completely 
+independent. In practice, the user choice will be affected by temporally correlated events, such as recent browsing 
+history or exposure to similar content. Therefore, a more realistic assumption is to allow the dependencies to decay 
+with time, rather than being completely absent. This way to model dependencies, often referred to as \emph{mixing}, is common to study concentration for sums of non-i.i.d.~random variables, with applications to machine learning \citep{bradley2005basic, mohri2008rademacher,abeles2024generalization}.
+
+In the present paper we relax the assumption that the noise is conditionally zero-mean in the bandit problem, and we allow for the presence of dependencies. Concretely, we replace  the standard 
+conditionally sub-Gaussian setting with a more general formulation that accounts for conditional 
+dependence of the noise on the past, by introducing a natural notion of \emph{mixing sub-Gaussianity}. Within this 
+context, we introduce a UCB algorithm for which we rigorously establish regret guarantees. There are two key challenges 
+for our approach: constructing a valid confidence sequence under dependent noise, and deriving a regret upper bound for 
+the UCB algorithm that we propose. 
+
+We derive the confidence sequence by adapting the \emph{online-to-confidence-sets} technique to accommodate temporal 
+dependencies in the noise. This approach, originally introduced by \cite{abbasi2011improved} and recently extended and 
+improved \citep{jun2017scalable, lee2024improved, clerico2025confidence}, involves 
+constructing an abstract online learning game whose regret guarantees can be turned into a confidence sequence. To deal 
+with the dependencies in the noise, we modify the standard online-to-confidence-sets framework by introducing delays in 
+the feedback received within the abstract online game. This approach is inspired by the recent work of 
+\cite{abeles2024generalization} on extending online-to-PAC conversions to non-i.i.d.~mixing data sets in the context of 
+deriving generalisation bounds for statistical learning. There, a  delayed-feedback trick similar to ours is employed to 
+derive statistical guarantees (generalisation bounds) from an abstract online learning game. 
+
+For the regret analysis of the bandit algorithm, we also need to face some challenges due to the correlated 
+observation noise. We address these by introducing delays into the decision-making policy as well.
+% adapting the classic 
+% ``elliptical potential lemma'' (cf.~Lemma 19.4 in \citealp{lattimore2020bandit}) to our setting, in order to 
+% upper-bound the width of the confidence sets.
+%\bapt{To be honest I really not see how to connect delayed bandit with our setting here because it seems in delayed 
+% bandit they still get a UCB algorithm without delay}
+This makes our approach superficially similar to algorithms used in the rich literature on bandits with delayed feedback
+(see, e.g., \citealp{vernade2020linear,howson2023delayed}). These works consider delay as part of the problem statement 
+and not part of the solution concept, and are thus orthogonal to our work. In particular, a simple adaptation of 
+results from this literature would not suffice for dealing with dependent observations, which we tackle by developing 
+new concentration inequalities. Another line of work that is conceptually related to ours is that of non-stationary 
+bandits \citep{garivier2008upper,russac2019weighted}. In that setting, the parameter vector $\theta^\star_t$ evolves in 
+time according to a nonstationary stochastic process, and the observation noise remains i.i.d., once again making for a 
+rather different problem with its own challenges. Namely, the main obstacle to overcome is that comparing with the 
+optimal sequence of actions becomes impossible unless strong assumptions are made about the sequence of 
+parameter vectors. A typical trick to deal with these nonstationarities is to discard old observations (which may have 
+been generated by a very different reward function), and use only recent rewards for decision-making. This is the polar 
+opposite of our approach that is explicitly \emph{disallowed} to use recent rewards, which clearly highlights how 
+different these problems are. That said, there exists an intersection between the worlds of delayed and nontationary 
+bandits \citep{vernade2020non}, and thus we would not discard the possibility of eventually building a bridge between 
+bandits with nonstationary reward functions and bandits with nonstationary observation noise. For simplicity, we focus 
+on the second of these two components in this paper.
+
+% 
+% The latter assumes that the unknown parameter is time-varying, \emph{i.e.} $Y_t = \siprod{\theta_t}{X_t}$. To compare it with the classical formulation assume $(\theta_t)_{t>0}$ is drawn from a stationary process and denote $\theta^\star= \EE{\theta_t}$ then we can write $Y_t = \siprod{\theta^\star}{X_t} + \ee_t$ where $\ee_t = \siprod{\theta_t-\theta^\star}{X_t}.$ This simple remark suggests that the methods developed in this work could be interesting for non stationary bandit, as our assumptions on $\ee_t$ could possibly be considered to model the variations of the unknown $\theta_t.$ 
+
+
+
+
+
+
+
+ %(\citealp{abbasi2011improved},\citealp{flynn2023improved}, \cite{lattimore2020bandit}, \cite{orabona2019modern}, \cite{lee2024unified} \cite{clerico2025confidencesequencesgeneralizedlinear}
+ 
+ \paragraph{Notation.}
+ Throughout the paper, we will often use the following notations. For $u$ and $v$ in $\real^p$, we let $\langle u, v\rangle$ denote their dot product. $\|u\|_2 = \sqrt{\langle u, u\rangle}$ is the Euclidean norm, while for a non-negative definite $(p\times p)$-matrix $A$, $\|u\|_A = \sqrt{\langle u, Au\rangle}$ is a semi-norm (a norm if the matrix is strictly positive definite). For $r>0$, $\mathcal B(r)$ denotes the closed centred Euclidean ball in $\real^p$ with radius $r$. Given a non-empty set $U\subseteq\real^p$, we let $\Delta_U$ denote the space of (Borel) probability measures on $\real^p$ whose support in $U$. Finally, $(u_t)_{t\geq t_0}$ denotes a sequence indexed on the integers, with $t_0$ its smallest index. 

@@ -1,0 +1,265 @@
+
+\subsection{Proof of Theorem \ref{thm:conf_seq_iid}}
+
+\begin{proof}
+For each $t \geq 1$, we choose the comparator to be $\wh\theta_t$. From \Cref{thm:standard_otcs}, the regret bound in Proposition \ref{pro:uniform_ewa_regret} and the fact that $\|\theta^{\star}\|_2 \leq B$, we know that for any $\lambda \geq 0$,
+\begin{equation*}
+\mathbb{P}\left(\forall t \geq 1, \sum_{s=1}^{t}\ell_s(\theta^{\star}) + \tfrac{\lambda}{2}\|\theta^{\star}\|_2^2 - \sum_{s=1}^{t}\ell_s(\wh\theta_t) \leq \tfrac{p}{2}\log\tfrac{(B+1)^2e\max(p, t)}{p} + \tfrac{\lambda}{2}\|\theta^{\star}\|_2^2 + \log\tfrac{1}{\delta}\right) \geq 1 - \delta\,.
+\end{equation*}
+
+By taking a second-order Taylor expansion of $\sum_{s=1}^{t}\ell_s(\theta) + \frac{\lambda}{2}\|\theta\|_2^2$ around $\wh\theta_t$, we obtain
+\begin{equation*}
+\sum_{s=1}^{t}\ell_s(\theta^{\star}) + \tfrac{\lambda}{2}\|\theta^{\star}\|_2^2 - \sum_{s=1}^{t}\ell_s(\wh\theta_t) = \tfrac{\lambda}{2}\|\wh\theta_t\|_2^2 + \iprod{\theta^{\star} - \wh\theta_t}{\lambda \wh\theta_t + \nabla\sum_{s=1}^{t}\ell_s(\wh\theta_t)} + \tfrac{1}{2}\|\theta^{\star} - \wh\theta_t\|_{V_t}^2\,.
+\end{equation*}
+
+Using the first-order optimality condition, we have that $\siprod{\theta^{\star} - \wh\theta_t}{\nabla\sum_{s=1}^{t}\ell_s(\wh\theta_t)} \geq 0$. Therefore, after a bit of algebra, the previous two equations tell us that
+\begin{equation*}
+\mathbb{P}\left(\forall t \geq 1, \|\theta^{\star} - \wh\theta_t\|_{V_t}^2 \leq p\log\tfrac{(B+1)^2e\max(p,t)}{p} + 2\lambda B^2 + 2\log\tfrac{1}{\delta}\right) \geq 1 - \delta\,.
+\end{equation*}
+
+Thus, the sets defined in the statement of the theorem form a confidence sequence for $\theta^{\star}$.
+\end{proof}
+
+
+
+\begin{proof}
+    Let define for $s \in[t], \lambda_s := \siprod{X_s}{\theta_s-\theta^*}$. Denote $g_s(\theta^*):=\ell_s(\theta^*)-\ell_s(\theta_s)$ and remark that $g_s(\theta^*)=-\frac{\lambda_s^2}{2}+\lambda_s\epsilon_s.$
+    \begin{align*}
+        \EEc{W_t}{\F_{t-1}}&= W_{t-1}\EEc{e^{-\frac{\lambda_t^2}{2}+\lambda_t\epsilon_t}}{\F_{t-1}}\\ 
+        &\leq W_{t-1}e^{\frac{(\sigma^2-1)\lambda_t^2}{2}} \qquad \text{($\sigma$-subgaussianity of } \epsilon_t)\\
+        &\leq W_{t-1} \qquad \text{(for } \sigma\leq 1) 
+    \end{align*}
+\end{proof}
+\subsection{Lemma \ref{lemma:mixing_concentration_bound}}
+\begin{lemma}
+\label{lemma:mixing_concentration_bound}
+    For any $t$ and $d \leq t$ with probability $1-\delta$:
+    \[ M_t(\theta^*)-Ct\phi_d \leq d \log\frac{d}{\delta},\]
+    where $C:=2\sup_{x,\theta} \siprod{x}{\theta}$
+\end{lemma}
+\begin{proof}
+We use 
+\begin{align*}
+\mathbb{P}(\forall t \geq d, M_t \leq d\log(1/\delta)) &\geq \mathbb{P}\left(\cap_{i \in [d]}[\forall k \geq 1]\right)
+\end{align*}
+
+\bapt{Hamish is gonna write a new version of this proof.}
+\label{proof::lemma_mixing_concentration_bound}
+We are gonna split the proof in two cases.
+
+\textbf{Case $t=Kd$}
+
+
+   Let $K =\frac{t}{d}$. Then we can rewrite $M_t$ as:
+   \[M_t = \sum_{i=1}^d M_K^i\] where $M_K^i = \sum_{k=1}^K \ell_{k}^i(\theta^*)-\ell_{k}^i(\theta_{k}^i)$ and denote the event $A_t(\delta) := [M_t(\theta^*) - Ct\phi_d \leq d \log \frac{1}{\delta}].$ Then 
+    \begin{align*}
+        \mathbb{P}(A_t) &\geq \mathbb{P}\left(\bigcap_{i \in [d]} \left[M_K^i-CK\phi_d \leq \log \frac{1}{\delta} \right]\right)\\
+        &\geq 1 -\mathbb{P}\left(\bigcup_{i \in [d]} \left[M_K^i-CK\phi_d > \log \frac{1}{\delta}  \right]\right) \\
+        &\geq 1-d\delta \qquad (\text{this last inequality comes from Lemma \ref{lemma::SMG_mixing})}
+    \end{align*}
+    Setting $\delta'=\frac {\delta}{d}$ and applying the above  with $A_t(\delta')$ yields the final result.
+    
+  \textbf{Case $t=(K-1)d + r:$}
+
+\end{proof}
+\subsection{Proof of Lemma \ref{lemma::SMG_mixing}}
+
+
+\label{proof:SMG_mixing}
+ 
+
+Let $t > 0$, we are gonna decompose the proof in 2 cases.  Either $t=Kd$ or $t = (K-1)d + r$, with $d>r>0$.
+
+\textbf{Case $t=Kd$}:
+In this case we can directly rewrite
+$$M_t = \sum_{i=1}^dM_K^i$$
+where $M_K^i= \sum_{k=1}^K g_k^i$ where $g_k^i$ is a shorthand for $g_{i+(k-1)d}$. Now let define for $k\in [K-1]$ the filtration $\F_k^i:= \sigma(x_i,\epsilon_i,X_{i+d},\epsilon_{i+d},\dots,,X_{i+(k-1)d},\epsilon_{i+(k-1)d},X_{i+kd})$ and prove that for any $k \in [K]$,
+$$\EE{e^{M_k^i-kC\phi_d}|\F_{k-1}^i}\leq e^{M_{k-1}^i-(k-1)C\phi_d}.$$
+The proof of the above statement is established below for $k=K.$
+\begin{align*}
+    \EE{e^{M_K^i-KC\phi_d}|\F_{K-1}^i}&=e^{M_{K-1}^i-(K-1)C\phi_d}\EEc{e^{g_K^i-C\phi_d}}{\F_{K-1}^i}\\
+    &= e^{M_{K-1}^i-(K-1)C\phi_d}\EEc{e^{-\frac{(\lambda_K^i)^2} {2}+\lambda_K^i\epsilon_K^i-C\phi_d}}{\F_{K-1}^i}\\
+    &= e^{M_{K-1}^i-(K-1)C\phi_d}e^{-\frac{(\lambda_K^i)^2}{2}-C\phi_d}\EEc{e^{\lambda_K^i\epsilon_K^i}}{\F_{K-1}^i} \qquad \text{(because $\lambda_K^i$ is $\F_{K-1}^i$-measurable*)}\\
+    &=e^{M_{K-1}^i-(K-1)C\phi_d}e^{-\frac{(\lambda_K^i)^2}{2}-C\phi_d}\underbrace{\EEc{e^{\lambda_K^i\left(\epsilon_K^i-\EEc{\epsilon_K^i}{\F_{K-1}^i}\right)}}{\F_{K-1}^i}}_{(1)}\underbrace{e^{\lambda_K^i\EEc{\epsilon_K^i}{\F_{K-1}^i}}}_{(2)}
+\end{align*}
+
+(*) This bit is fundamental in the design of our algorithm so we want to shed the light on why it's true. By definition $\lambda_K^i:= \siprod{X_K^i}{\theta_K^i-\theta^*}$, so it is enough is to assume that both $x_K^i$ and $\theta_K^i$ are $\F_{K-1}^i$-measurable. The former is clearly stated in the assumption of Lemma \ref{lemma::SMG_mixing}, the latter is justified because of the delay incurred by online learner in the abstract game . 
+ 
+To bound $(2)$ we use assumption \ref{eq::mixing}, this implies that $(2) \leq e^{|\lambda_K^i|\phi_d}$. Recall that $\lambda_t:=\siprod{X_t}{\theta_t-\theta^*}$ and we can reasonably assume that $|\lambda_t| \leq C$ for all $t$ (this amounts to saying that $\X$ and $\Theta$ are bounded). To bound $(1)$ we apply Assumption \ref{ass:mixing-subgaussianity}.
+Combining everything it follows that:
+\begin{align*}
+     \EE{e^{M_K^i-KC\phi_d}|\F_{K-1}^i} \leq e^{M_{K-1}^i-(K-1)C\phi_d}.
+\end{align*}
+
+\textbf{Case $t=(K-1)d + r$ with $0<r<d$:} 
+
+In this case we can no longer rewrite $M_t$ as a sum over each block $M_t := \sum_{i=1}^d M_K^i$
+    where $M_K^i := \sum_{k=1}^K g_{i+(k-1)d}$, because $g_{i+(K-1)d}$ is  not defined for $i>r$. Therefore we are gonna decompose it into two sums, those of length $K$ and those of length $K-1$. Formally:
+    $$M_t := \sum_{i=1}^r M_K^i + \sum_{i=r+1}^d M_{K-1}^i$$
+    and apply the result of the first case to each block.
+
+\subsection{Randomised Online Learning Algorithms/Sequential Probability Assignment in the standard setting}
+\label{sec:ewa}
+
+We can build a confidence sequence using the outputs $\theta_1, \theta_2, \dots$ of an algorithm for online squared error regression using the regret plus log of martingale decomposition
+\begin{equation*}
+\sum_{s=1}^t\ell_t(\theta^*)-\ell_s(\wh \theta_t) = \underbrace{\sum_{s=1}^t \ell_s(\theta_s)-\ell_s(\wh \theta_t) }_{\text{regret term}}  + \underbrace{\sum_{s=1}^t \ell_s(\theta^*)-\ell_s(\theta_s)}_{\text{log martingale term}}\,.
+\end{equation*}
+\begin{lemma} If we assume $(\epsilon_t)$ conditionally zero-mean and 1-sub-Gaussian, then
+    \label{lemma:Concentration_SMG_classic}
+    $M_t:=e^{\sum_{s=1}^t \ell_s(\theta^*)-\ell_s(\theta_s)}$ is a supermartingale w.r.t $\F_t$.
+\end{lemma}
+\begin{proof}
+    We denote for $t>0, \lambda_t(\theta) = \langle \theta_t -\theta^\star, X_t\rangle$ and remark that $\ell_t(\theta^*)-\ell_t(\theta_t) = -\frac{\lambda_t(\theta^*)^2}{2}+\lambda_t(\theta^*)\epsilon_t$ We have 
+    \begin{align*}
+        \EEc{M_t}{\F_{t-1}}&= M_{t-1}\EEc{e^{-\frac{\lambda_t(\theta^*)^2}{2}+\lambda_t(\theta^*)\epsilon_t}}{\F_{t-1}}\\
+        &=M_{t-1}e^{-\frac{\lambda_t(\theta^*)^2}{2}}\EEc{e^{\lambda_t(\theta^*)\epsilon_t}}{\F_{t-1}} \\
+        &\leq M_{t-1}.
+    \end{align*}
+The second equality holds because $\lambda_t(\theta^*)$ is $\F_{t-1}$-measurable. The inequality is due to the 1-sub-Gaussianity of $\epsilon_t$ which implies that $\EEc{e^{\lambda_t(\theta^*)\epsilon_t}}{\F_{t-1}}\leq e^{\frac{\lambda_t(\theta^*)^2}{2}}.$
+\end{proof}
+
+The best known bounds on this regret term are of order $\mathcal{O}(\max_{s \in [t]}Y_s^2 p\log(t))$. The maximum squared label can be bounded by a constant times $\log(t)$, so we get $\mathcal{O}(p\log(t)^2)$. However, we would like the RHS to be of order $\mathcal{O}(p\log(t))$. We can remove the dependence on the max label by switching to randomised online learning algorithms, which return a sequence of distributions $Q_1, Q_2, \dots, $ on the set of parameter vectors. We define $\mathcal{L}_s(Q) = -\log(\int\exp(-\ell_s(\theta))\mathrm{d}Q(\theta))$, which is sometimes called the log loss. We can then write
+\begin{equation}
+\sum_{s=1}^t\ell_s(\theta^*)-\ell_s(\wh \theta_t) = \underbrace{\sum_{s=1}^t \mathcal{L}_s(Q_s)-\ell_s(\wh \theta_t) }_{\text{regret term}}  + \underbrace{\sum_{s=1}^t \ell_s(\theta^*)-\mathcal{L}_s(Q_s)}_{\text{log martingale term}}\label{eqn:randomised_reg_plus_mart}
+\end{equation}
+
+As long as the distributions $(Q_s)_{s \in \mathbb{N}}$ are predictable w.r.t.\ $(\mathcal{F}_s)_{s \in \mathbb{N}}$, then the log martingale term is still the log of a non-negative supermartingale. If we let $M_t = \exp(\sum_{s=1}^{t}\ell_s(\theta^*) - \mathcal{L}_s(Q_s))$, then by using the fact that each $Q_s$ is $\mathcal{F}_{s-1}$-measurable,
+\begin{align*}
+\mathbb{E}[M_t|\mathcal{F}_{t-1}] &= M_{t-1}\mathbb{E}[\exp(\ell_t(\theta^*) - \mathcal{L}_t(Q_t))|\mathcal{F}_{t-1}]\\
+&= M_{t-1}\mathbb{E}\left[\int\exp(\ell_t(\theta^*) - \ell_t(\theta))\mathrm{d}Q_t(\theta)\Big|\mathcal{F}_{t-1}\right]\\
+&= M_{t-1}\int\mathbb{E}[\exp(\ell_t(\theta^*) - \ell_t(\theta))|\mathcal{F}_{t-1}]\mathrm{d}Q_t(\theta)\\
+&\leq M_{t-1}\,,
+\end{align*}
+
+where the last inequality follows from the proof of Lemma \ref{lemma:Concentration_SMG_classic} (which shows that $\mathbb{E}[\exp(\ell_t(\theta^*) - \ell_t(\theta))|\mathcal{F}_{t-1}] \leq 1$). The regret term is now the regret of $(Q_s)_{s \in [t]}$ in a problem called \emph{sequential probability assignment}. There are algorithms for sequential probability assignment that have regret of order $\mathcal{O}(p\log(t/p))$, which gives us a RHS with the right dependence on $p$ and $t$. In this setting, if we use the Exponentially Weighted Average (EWA) forecaster to generate $Q_1, Q_2, \dots$, then we can write down a closed-form expression for this regret term. The EWA forecaster (with learning rate 1) is defined by
+\begin{equation*}
+\frac{\mathrm{d}Q_t}{\mathrm{d}Q_1}(\theta) = \frac{\exp(-\sum_{s=1}^{t-1}\ell_s(\theta))}{\int \exp(-\sum_{s=1}^{t-1}\ell_s(\theta))\mathrm{d}Q_1(\theta)}\,.
+\end{equation*}
+
+Since $\ell_t$ is the negative log likelihood (if the noise was actually Gaussian), this is equivalent to Bayesian linear regression. Using the definition of $Q_t$, we can write the total log loss as
+\begin{align*}
+\sum_{t=1}^{n}\mathcal{L}_t(Q_t) &= \sum_{t=1}^{n}-\log\int\exp(-\ell_t(\theta))\mathrm{d}Q_t(\theta)\\
+&= \sum_{t=1}^{n}-\log\left(\frac{\int \exp(-\sum_{s=1}^{t}\ell_s(\theta))\mathrm{d}Q_1(\theta)}{\int \exp(-\sum_{s=1}^{t-1}\ell_s(\theta))\mathrm{d}Q_1(\theta)}\right)\\
+&= -\log\int \exp\left(-\sum_{t=1}^{n}\ell_t(\theta)\right)\mathrm{d}Q_1(\theta)\,.
+\end{align*}
+
+By subtracting $\sum_{s=1}^{t}\ell_s(\wh\theta_t)$ from both sides, we see that the regret term is
+\begin{equation}
+\sum_{s=1}^{t}\mathcal{L}_s(Q_s) - \sum_{s=1}^{t}\ell(\wh\theta_t) = -\log\int \exp\left(-\sum_{s=1}^{t}\ell_t(\theta) + \sum_{s=1}^{t}\ell_t(\wh\theta_t)\right)\mathrm{d}Q_1(\theta)\,.\label{eqn:ewa_regret}
+\end{equation}
+
+If $Q_1$ is Gaussian, this integral can be evaluated using the Gaussian integral formula (see next Section).
+
+
+\subsection{Regularised Confidence Sets}
+\label{sec:regularised_sets}
+
+We know how to design confidence sets of the form
+\begin{equation*}
+\Theta_t = \left\{\theta: \sum_{s=1}^{t}\ell_s(\theta) - \sum_{s=1}^{t}\ell_s(\wh \theta_t) \leq \beta_t(\delta)\right\}\,.
+\end{equation*}
+
+For the bandit analysis, it is convenient to re-write this set such that the constraint is
+\begin{equation*}
+\|\theta - \wh \theta_n\|_{V}^2 \leq \wt\beta_n(\delta)\,,
+\end{equation*}
+
+where $V$ is some positive (semi-)definite matrix. Since $\sum_{t=1}^{n}\ell_t(\theta)$ is a quadratic function of $\theta$, it's second-order Taylor expansion has remainder 0. Therefore,
+\begin{equation*}
+\sum_{s=1}^{t}\ell_s(\theta) - \sum_{s=1}^{t}\ell_s(\wh\theta_t) = \iprod{\theta - \wh\theta_t}{\nabla\sum_{s=1}^{t}\ell_s(\wh\theta_t)} + \frac{1}{2}\|\theta - \wh\theta_t\|_{\nabla^2\sum_{s=1}^{t}\ell_s(\wh\theta_t)}^2\,.
+\end{equation*}
+
+Since, $\wh\theta_n$ is a minimiser of $\sum_{s=1}^{t}\ell_s(\theta)$, $\nabla\sum_{s=1}^{t}\ell_s(\wh\theta_t)$. For any $\theta$, $\nabla^2\sum_{s=1}^{t}\ell_s(\theta) = \sum_{s=1}^{t}X_sX_s^{\top}$. Therefore, letting $\Lambda_t = \sum_{s=1}^{t}X_sX_s^{\top}$, the original set defined in terms of losses is the same as
+\begin{equation*}
+\Theta_t = \left\{\theta: \|\theta - \wh \theta_t\|_{\Lambda_t}^2 \leq 2\beta_t(\delta)\right\}\,.
+\end{equation*}
+
+However, for the elliptical potential stuff in the next section, we need a confidence set like this where the matrix $\Lambda_n$ is replaced by $V_t= \Lambda_t + \lambda I$, which is always strictly positive definite. We can replace $\Lambda_n$ with $V_t$ by using regularised losses. We define $\wh\theta_{t,\lambda} := \argmin_{\theta \in \real^d}\{\sum_{s=1}^{t}\ell_s(\theta) + \frac{\lambda}{2}\|\theta\|_2^2\}$ to be the minimiser of the regularised loss. Since the regularised loss is still quadratic in $\theta$, and $\nabla^2[\sum_{s=1}^{t}\ell_s(\theta) + \frac{\lambda}{2}\|\theta\|_2^2] = V_t$, another Taylor expansion tells us that
+\begin{equation}
+\sum_{s=1}^{t}\ell_s(\theta) + \frac{\lambda}{2}\|\theta\|_2^2 - \sum_{s=1}^{t}\ell_t(\wh\theta_{t,\lambda}) + \frac{\lambda}{2}\|\wh\theta_{t,\lambda}\|_2^2 = \frac{1}{2}\|\theta - \wh\theta_{t,\lambda}\|_{V_t}^2\,.
+\label{eqn:reg_loss_taylor}
+\end{equation}
+
+We will also use the following Gaussian integral formula:
+\begin{equation*}
+\int_{\real^p}\exp\left(-\tfrac{1}{2}\|\theta - \mu\|_{\Sigma^{-1}}^2\right)\mathrm{d}\theta = \sqrt{(2\pi)^d\det(\Sigma)}\,.
+\end{equation*}
+
+Using these two equations (as well as Equation \eqref{eqn:ewa_regret}), we can evaluate the regret of EWA (with the prior $Q_1 = \mathcal{N}(0, \frac{1}{\lambda}I)$) against $\wh\theta_{n,\lambda}$ as
+\begin{align*}
+\sum_{s=1}^t \mathcal{L}_s(Q_s)-\ell_t(\wh \theta_t) &= -\log\int \exp\left(-\sum_{s=1}^{t}\ell_t(\theta) + \sum_{s=1}^{t}\ell_t(\wh\theta_t)\right)\mathrm{d}Q_1(\theta)\\
+&= -\log\left(\frac{\int_{\real^p}\exp(-\sum_{s=1}^{t}\ell_s(\theta) - \frac{\lambda}{2}\|\theta\|_2^2 + \sum_{s=1}^{t}\ell_s(\wh\theta_t))\mathrm{d}\theta}{\int_{\real^p}\exp(-\frac{\lambda}{2}\|\theta\|_2^2)\mathrm{d}\theta}\right)\\
+&= -\log\left(\frac{\int_{\real^p}\exp(-\frac{1}{2}\|\theta - \wh\theta_{t,\lambda}\|_{V_t}^2)\mathrm{d}\theta}{\int_{\real^p}\exp(-\frac{\lambda}{2}\|\theta\|_2^2)\mathrm{d}\theta}\right) + \frac{\lambda}{2}\|\wh\theta_{t,\lambda}\|_2^2\\
+&= \frac{1}{2}\log\det(\tfrac{1}{\lambda}\Lambda_t + I) + \frac{\lambda}{2}\|\wh\theta_{t,\lambda}\|_2^2\,.
+\end{align*}
+
+Combining this with Equation \eqref{eqn:randomised_reg_plus_mart}, and the $\log(1/\delta)$ bound on the martingale term, we obtain
+\begin{equation*}
+\mathbb{P}\left(\forall t \geq 1, ~\sum_{s=1}\ell_s(\theta^*) - \sum_{s=1}^{t}\ell_t(\wh\theta_{t,\lambda}) \leq \frac{1}{2}\log\det(\tfrac{1}{\lambda}\Lambda_t + I) + \frac{\lambda}{2}\|\wh\theta_{t,\lambda}\|_2^2 + \log\frac{1}{\delta}\right) \geq 1 - \delta
+\end{equation*}
+
+If we add $\frac{\lambda}{2}\|\theta^*\|_2^2 - \frac{\lambda}{2}\|\wh\theta_{t,\lambda}\|_2^2$ to both sides, assume that $\|\theta^*\|_2 \leq B$ and use Equation \eqref{eqn:reg_loss_taylor}, then this becomes
+\begin{equation*}
+\mathbb{P}\left(\forall t \geq 1, ~\|\theta^* - \wh\theta_{t,\lambda}\|_{V_t}^2 \leq \log\det(\tfrac{1}{\lambda}\Lambda_t + I) + \lambda B^2 + 2\log\frac{1}{\delta}\right) \geq 1 - \delta
+\end{equation*}
+
+Therefore, we can use
+\begin{equation*}
+\Theta_t = \left\{\theta: \|\theta - \wh\theta_{t,\lambda}\|_{V_t}^2 \leq \log\det(\tfrac{1}{\lambda}\Lambda_t + I) + \lambda B^2 + 2\log\frac{1}{\delta}\right\}\,.
+\end{equation*}
+
+If we choose $\lambda = 1/B^2$, then the squared radius of the confidence set is
+\begin{equation*}
+\beta_n = \log\det(B^2\Lambda_t + I) + 1 + 2\log\frac{1}{\delta} \geq 1\,.
+\end{equation*}
+
+If we also assume that $\max_{s}\|X_s\|_2 \leq L$, then the Determinant-Trace Inequality from \citet{abbasi2011improved} tells us that $\log\det(\tfrac{1}{\lambda}\Lambda_t + I) \leq p\log(1 + \frac{tL^2}{\lambda p})$, which means we get $\beta_t \leq p\log(1 + \frac{tB^2L^2}{p})  + 1 + 2\log\frac{1}{\delta}$, which is of order $\mathcal{O}(p\log(n/p))$. For $t=0$, we can define $\Theta_0$ the be the $\ell_2$ ball of radius $B$, or equivalently
+\begin{equation*}
+\Theta_0 = \left\{\theta: \|\theta - \wh\theta_{0,1/B^2}\|_{V_0}^2 \leq \beta_0\right\}\,,
+\end{equation*}
+
+where $\beta_0 = 1$, $V_0 = \frac{1}{B^2}I$ and $\wh\theta_{0,1/B^2} = \argmin_{\theta}\{\frac{1}{2B^2}\|\theta\|_2^2\} = 0$.
+
+\subsection{Elliptical Potential Stuff}
+\label{app::sec:elliptical_potential}
+
+Here, we go through the elliptical potential stuff from \citet{abbasi2011improved} (also in \citet{lattimore2020bandit}) and say a bit about how it fits into the regret analysis of LinUCB/OFUL. We will assume that $\|\theta^*\|_2 \leq 1$ and $\max_{t}\|X_t\|_2 \leq 1$. As already mention in Section \ref{subsec:regret_analysis_standard}, we can bound the regret $r_t$ of LinUCB in round $t$ as
+\begin{equation*}
+r_t \leq 2\sqrt{\beta_{t-1}(\delta)}\min(1, \|X_t\|_{V_{t-1}^{-1}})\,.
+\end{equation*}
+
+We have established bounds on $\beta_t(\delta)$ already, so we only need to bound $\sum_{t=1}^{T}\min(1, \|X_t\|_{V_{t-1}^{-1}})$. The elliptical potential lemma provides a bound on $\sum_{t=1}^{T}\min(1, \|X_t\|_{V_{t-1}^{-1}}^2)$, which would allow us to bound $\sum_{t=1}^{T}r_t^2$. We can relate $\sum_{t=1}^{T}r_t$ to $\sum_{t=1}^{T}r_t^2$ in two ways. First, we can use the Cauchy-Schwarz inequality to obtain
+\begin{equation*}
+\sum_{t=1}^{T}r_t \leq \sqrt{T\sum_{t=1}^{T}r_t^2}\,.
+\end{equation*}
+
+This will lead to a regret bound of order $\mathcal{O}(p\sqrt{T}\log(T))$. If we know that there is a positive gap between the reward of the best and second best actions in every round, then we can do something else. Let $X_t^* = \argmax_{x \in \mathcal{X}_t}\iprod{\theta^*}{x}$ and define $\Delta = \min_{t \in [T]}\min_{x \in \mathcal{X}_t\setminus\{X_t^*\}}\{\iprod{\theta^*}{X_t^* - x}\}$. We assume that $\Delta > 0$. In every round, we have either $r_t = 0$ or $r_t \geq \Delta$, which means
+\begin{equation*}
+\sum_{t=1}^{T}r_t \leq \frac{1}{\Delta}\sum_{t=1}^{T}r_t^2\,.
+\end{equation*}
+
+This leads to regret bounds of order $\mathcal{O}(\frac{p^2\log^2(T)}{\Delta})$ (or maybe $\mathcal{O}(\frac{p^2\log(T)}{\Delta})$). The only thing left is the elliptical potential lemma itself.
+
+
+
+\subsection{Regret analysis in the standard setting}
+\label{subsec:regret_analysis_standard}
+\textit{In this subsection we can assume that $\X$ is the initial set of actions and remains the same for each round. A more general assumption where our results would still apply is to assume the actions sets are time-dependent but fixed in advance by an oblivious adversary. Also we will assume $\dim(\X)=p$.}
+\\
+
+\noindent
+Now that we have built our confidence sequence we are ready to bound the regret. Let's start by recalling the regret definition : 
+\[\Reg(T) = \sum_{t=1}^T \langle X_t^*-X_t,\theta^*\rangle\]
+The standard analysis follows from \cite{abbasi2011improved} and consists in two main steps.
+\\
+
+\noindent The first one focuses on bounding the instantaneous regret $r_t := \langle X_t^*-X_t,\theta^*\rangle.$ We have the following : 
+    \begin{align*}
+        r_t &= \langle X_t^*,\theta^*\rangle - \langle X_t,\theta^*\rangle\\
+        &\leq \langle X_t,\theta_t\rangle - \langle X_t,\theta^*\rangle \qquad \qquad \text{(since $(X_t,\theta_t) = \argmax_{(x,\theta) \in \mathcal{X_t} \times C_{t-1}(\delta)} \langle x,\theta\rangle $)} \\
+        &= \langle x_t,\theta_t - \hat \theta_t \rangle + \langle x_t,\hat \theta_t - \theta^*\rangle \\
+        &\leq 2\beta_{t}(\delta)||X_t||_{\bar C_{t-1}^{-1}} \qquad \qquad \text{(applying Cauchy-Schwarz )}
+    \end{align*}
+   Here $\beta_t(\delta)\geq ||\wh \theta_{t-1} - \theta^*||_{V_{t-1}}$ is the width of the $C_t(\delta)$ centered around $\wh \theta_{t-1}:= V_{t-1}^{-1}\sum_{s=1}^{t-1}Y_sX_s=\theta^*+V_{t-1}^{-1}\sum_{s=1}^{t-1}\epsilon_tX_t$.
+The last part of this step is to bound the norm of the actions. The technique is also refers to as the Elliptical potential lemma which we state below.

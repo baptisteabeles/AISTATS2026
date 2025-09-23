@@ -1,0 +1,31 @@
+\section{Conclusion}
+
+We leave several interesting questions open for future research. Some of these are listed below.
+
+% In this paper, we have introduced an alternative to the standard i.i.d. assumption on the observation noise in the linear bandit problem to account for temporal dependencies.  Inspired by the online-to-confidence-set conversion scheme we have derived confidence sets for this new setting and proved that our Mixing-LinUCB algorithm matches the standard rates up to a factor of the mixing time for geometric mixing. We now conclude by mentioning the main limitations and open problems regarding this work.
+
+An important limitation of our algorithm is that it requires the knowledge of the mixing coefficients (or at least an 
+upper-bound on them). It would be interesting to explore the possibility of relaxing this assumption and to design an 
+algorithm which infers the mixing coefficients while minimizing the regret. We note that the problem of estimating 
+mixing coefficients is already a hard problem on its own right, with tight sample-complexity results only available in 
+special cases such as Markov chains \citep{hsu2019mixing,wolfer2020mixing}. We also note that in order to recover the 
+standard rate for the regret bound, the delay $d$ introduced in our algorithm need to be chosen as a function of the 
+horizon $T$. We believe that this could be fixed at little conceptual expense by using time-varying delay in the 
+analysis, but we did not attempt to work out the (potentially non-trivial) details here.
+
+Another limitation is that our analysis assumed throughout that the adversary picking the decision sets $\X_t$ is 
+oblivious, which is typically not required in linear bandit problems. For us, this was necessary to avoid potential 
+statistical dependence between decision sets and the nonstationary observations. We believe that this issue can be 
+handled at least for some classes of adversaries. For instance, it is easy to see that our analysis would carry through 
+under the assumption that the decision sets be selected based on delayed information only. We leave the investigation 
+of this question under more realistic assumptions open for future work.
+
+
+% In this work we have focused on the (contextual) linear bandit problem. This naturally raised the question about whether or not these results can be extended to more general bandit problems (such as GLMs). 
+
+% One of the main assumption in this work is the oblivious nature of the adversary. One may wonder what is happening if the actions sets can be selected by the adversary based on the actions played by the agent. 
+
+
+
+% Although our setting is very different, we believe that several techniques developed here could be of interest for non-stationary bandit problems.
+

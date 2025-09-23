@@ -1,0 +1,87 @@
+
+% \section{Mixing Bandit: main results}
+\section{Linear bandits with non-i.i.d.~observation noise} \label{sec:contrib} 
+We study a variant of the standard linear stochastic bandit problem where the observation-noise variables feature 
+dependencies across different rounds. We focus on the case of weakly stationary noise, meaning we assume all the $\ee_t$ to have the same marginal distribution. %\eug{To check later: is this 
+%actually used?} \grg{I think we only use a weaker form that is sometimes called ``weak stationarity'': that 
+%the marginal expectation of the noise is zero at any $t$.}
+However, the core assumption we make is what we call \emph{mixing sub-Gaussianity}. This provides a way to control how dependencies decay as the time between two 
+observations increases. It is defined in terms of a sequence of mixing coefficients $\phi_d$, which quantify this decay. \begin{assumption}[Mixing sub-Gaussianity]
+\label{ass:mixing-subgaussianity}
+Fix $\sigma>0$ and let $\phi = (\phi_d)_{d\geq 0}$ be a non-negative and non-increasing sequence. We say that the random sequence $(\epsilon_t)_{t\geq 1}$ is \emph{$(\sigma, \phi)$-mixing sub-Gaussian} if $\ee_t$ is centred and $\sigma$-sub-Gaussian for every $t$, and, for all $d\geq 0$ and all $t>d$, we have
+\begin{equation}
+\label{eq::mixing}
+    \bigl|\EEc{\epsilon_t}{\F_{t-d}} \bigr| \leq \phi_d
+\end{equation}
+and
+\begin{equation}
+\label{eq::mixing-subgaussianity}
+   \EEc{\exp{\lambda(\epsilon_t-\EEc{\epsilon_t}{\F_{t-d}})}}{\F_{t-d}}\leq e^{\frac{\lambda^2\sigma^2}{2}}\,,
+ \forall \lambda>0\,.
+\end{equation}
+\end{assumption}
+
+Clearly, the above assumption generalises the standard conditionally sub-Gaussian assumption (that can be recovered by 
+setting $\phi_d=0$ for all $t$), sometimes considered in the bandit literature. Although this might look like an 
+unusual mixing assumption, it is very natural for our problem at hand, and can be weaker than standard mixing 
+hypotheses. For instance, if the noise sequence is $\varphi$-mixing (see \citealp{bradley2005basic}) and each $\ee_t$ 
+is centred and bounded in $[-a,b]$, it is straightforward to check that $|\E[\ee_t|\F_{t-d}]| \leq (a+b)\phi_d$, and so 
+Assumption \ref{ass:mixing-subgaussianity} is satisfied since the boundedness automatically implies sub-Gaussianity. In the rest of the paper we assume $\sigma =1$ for simplicity.
+
+Under Assumption \ref{ass:mixing-subgaussianity}, we can build the confidence sequence needed for our UCB algorithm. We 
+state this result below, but defer the explicit derivation to \Cref{sec:conf_sets} (see Corollary \ref{cor:conf} there). %\eug{The statement below needs to be checked once derivation in sec 4 is completed...}
+
+\begin{prop}%[Confidence sequence under mixing sub-Gaussianity]
+ \label{prop:CS_Mixing_Bandit} For some given $\phi$, let the noise satisfy Assumption \ref{ass:mixing-subgaussianity} with $\sigma=1$. Fix $\delta\in(0,1)$, $\lambda>0$, and $d\geq 1$. For $t\geq 1$ let \begin{align*}
+ \mathcal\C_t = \Big\{\theta\in\mathcal B(B)\,:\,\tfrac{1}{2}\|\theta-\wh\theta_t\|_{V_t}^2&\leq \tfrac{dp}{2}\log\tfrac{(B+1)^2e\max(dp,t+d)}{dp} 
+\\&+ 2\lambda B^2 + t\phi_d (B+1) + d\log\tfrac{d}{\delta}\Big\}\,,
+ \end{align*} where $V_t = \sum_{s=1}^t X_tX_t^\top + \lambda\mathrm{Id}$, and $\wh\theta_t = \argmin_{\theta\in\mathcal B(B)} \sum_{s=1}^t(\langle \theta,X_t\rangle -Y_t)^2$. Then, $(\C_t)_{t\geq 1}$ is an anytime valid confidence sequence, in the sense that
+ $$\mathbb P\big(\theta^\star\in \C_t\,,\;\forall t\geq 1\big)\geq 1-\delta\,.$$
+ \end{prop}
+ 
+ %\begin{corollary}(Confidence Sets for Geometric Mixing)
+ %\label{coro:geometrix_mixing}
+ %    Assume $(\epsilon_t)_{t=1}^n$ satisfies Assumption \ref{ass:mixing-subgaussianity} with $\phi_d = Ce^{-\frac{d}{\tau}}$ for some $C,\tau>0$
+ %    \[\mathbb{P}\left[\forall t >0, \theta^* \in C_t(\delta)\right] \geq 1-\delta,\]
+ %    where we define
+ %    \begin{equation}
+ %    \label{eq:theorem1}C_t(\delta):= \left\{\theta, \LL_t(\theta)-\LL_t(\wh \theta_t) \leq dp\log(t/dp) + BCte^{-\frac{d}{\tau}} + d \log\frac{d}{\delta}\right\} 
+ %    \end{equation}
+ %\end{corollary}
+ %\begin{corollary}(Confidence Sets for Algebraic Mixing)
+ %\label{coro:algebraic_mixing}
+ %     Assume $(\epsilon_t)_{t=1}^n$ satisfies Assumption \ref{ass:mixing-subgaussianity} with $\phi_d = Cd^{-r}$ for some $C,r>0$
+ %    \[\mathbb{P}\left[\forall t >0, \theta^* \in C_t(\delta)\right] \geq 1-\delta,\]
+ %    where we define
+ %    \begin{equation}
+ %    \label{eq:theorem1}C_t(\delta):= \left\{\theta, \LL_t(\theta)-\LL_t(\wh \theta_t) \leq dp\log(t/dp) + BCtd^{-r} + d \log\frac{d}{\delta}\right\} 
+ %    \end{equation}
+ %\end{corollary}
+
+Leveraging the confidence sequence above, we can define a UCB approach for our problem (\Cref{alg::Mixing_LinUCB}). At a high level, the algorithm 
+ operates by taking the confidence sets defined in Proposition 
+\ref{prop:CS_Mixing_Bandit}, and selecting the arm optimistically, as in the standard UCB. A key point is that a delay 
+$d$ is introduced, which at round $t$ restricts the agent to use only the information available from the first $t-d$ 
+rounds. Although the actual technical reason behind this restriction will become fully clear only with the analysis of the 
+coming sections, one can intuitively think of it as a way to prevent overfitting to recent noise, which might be 
+highly correlated. If $d$ is sufficiently large, the noise observed in each round $t$ will 
+be sufficiently decorrelated from the previous observations, which allows accurate estimation and uncertainty 
+quantification of the true parameter $\theta^\star$ and the associated rewards.  
+
+\begin{algorithm}[!h]
+\caption{Mixing-LinUCB}\label{alg::Mixing_LinUCB}
+\begin{algorithmic}
+%(\frac{1}{K},...,\frac{1}{K})
+\State set $d>0$
+\For {$i \in \{1,2,\dots d\}$}
+\State play an arbitrary $X_i$ and observe $Y_i$
+\EndFor
+\For {$t \in \{d+1,\dots\}$}
+\State  $X_{t} = \arg\max_{x \in \X_t} \ucb_{\C_{t-d}}(x)$, where $\C_{t-d}$ is as in Proposition \ref{prop:CS_Mixing_Bandit}
+\State play $X_t$ and observe reward $Y_t$
+\EndFor
+\end{algorithmic}
+\end{algorithm} 
+
+In Section \ref{sec:bandit_regret} we provide a detailed analysis of the regret of the algorithm that we proposed. For instance, assuming that the mixing coefficients decay exponentially as $\phi_d = C e^{-d/\tau}$ (\emph{geometric mixing}), we show that the regret can be upper bounded in high probability as  \[\Reg(T) \leq \OO\left(\tau p\sqrt{T}\log(T)^2+\tau \log T\sqrt{pT \log T}\right).\]
+We refer to Theorem \ref{thm:worst_case_reg} and Corollary \ref{cor:geometric_mixing} in Section \ref{sec:bandit_regret} for more details.
