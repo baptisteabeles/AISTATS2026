@@ -11,31 +11,39 @@ First, following the regret analysis in \citet{abbasi2011improved} (see also Sec
 \end{align*}
 
 Recall that, for all $s$, $V_s = \Lambda_s + \lambda\mathrm{Id}$, which is invertible as $\lambda>0$. Thus, by Cauchy-Schwarz,
-\begin{equation*}
-R_t \leq \siprod{\wt\theta_{t-d} - \theta^{\star}}{X_t} \leq \|\wt\theta_{t-d} - \theta^{\star}\|_{V_{t-d}}\|X_t\|_{V_{t-d}^{-1}} \leq 2\beta_{t-d}\|X_t\|_{V_{t-d}^{-1}}\,.
-\end{equation*}
+\begin{align*}
+R_t &\leq \siprod{\wt\theta_{t-d} - \theta^{\star}}{X_t} \\
+&\leq \|\wt\theta_{t-d} - \theta^{\star}\|_{V_{t-d}}\|X_t\|_{V_{t-d}^{-1}} \\
+&\leq 2\beta_{t-d}\|X_t\|_{V_{t-d}^{-1}}\,.
+\end{align*}
 
 This means that the instantaneous regret satisfies the bound
 \begin{equation}
-R_t \leq 2\max(B, \beta_{t-d})\min(1, \|X_t\|_{V_{t-d}^{-1}})\,.\label{eqn:inst_reg}
+R_t \leq 2\max(B, \beta_{t})\min(1, \|X_t\|_{V_{t-d}^{-1}})\,.\label{eqn:inst_reg}
 \end{equation}
+
+
 
 Next, we separate the regret suffered in the first $d$ rounds and the remaining $T-d$ rounds. We then use Cauchy-Schwarz once more, and the fact that $\beta_{t}$ is increasing in $t$, to obtain
 \begin{align*}
-&\Reg(T) \leq 2dB + \sqrt{(T-d){\textstyle\sum_{t=d+1}^{T}}R_t^2}\\
-&\leq 2dB + \sqrt{4(T-d)\max(B^2, \beta_{T-d}^2){\textstyle\sum_{t=d+1}^{T}}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2)}\,.
+&\Reg(T) \leq 2dB + \sqrt{(T-d){\textstyle\sum\limits_{t=d+1}^{T}}R_t^2}\\
+&\leq 2dB + \sqrt{4(T-d)\zeta_{T}{\textstyle\sum\limits_{t=d+1}^{T}}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2)}\,.
 \end{align*}
+where we have defined $\zeta_t=\max(B^2, \beta_{t-d}^2).$
 
-At this point, we must depart from the standard linear UCB analysis \citep{abbasi2011improved, lattimore2020bandit}. We bound the sum of the \emph{elliptical potentials} $\sum_{t=d+1}^{T}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2)$ using the following variant of the well-known ``elliptical potential lemma'' (see Appendix), which accounts for the fact that the feature covariance matrix $V_{t-d}$ is updated with a delay of $d$ steps.
+
+
+At this point, we must depart from the standard linear UCB analysis \citep{abbasi2011improved, lattimore2020bandit}. We bound the sum of the \emph{elliptical potentials} $\sum\limits_{t=d+1}^{T}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2)$ using the following variant of the well-known ``elliptical potential lemma'' (see Appendix \ref{proof:delay_elliptical}), which accounts for the fact that the feature covariance matrix $V_{t-d}$ is updated with a delay of $d$ steps.
 \begin{lemma}
 For all $T \geq d+1$,
 \begin{equation*}
-\sum_{t=d+1}^{T}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2) \leq 2dp\log(1 + \tfrac{T}{\lambda dp})\,.
+\sum_{t=d+1}^{T}\min\left(1, \|X_t\|_{V_{t-d}^{-1}}^2\right) \leq 2dp\log(1 + \tfrac{T}{\lambda dp})\,.
 \end{equation*}
 \label{lem:delay_elliptical}
 \end{lemma}
 
 We can now state a worst-case regret upper bound for Mixing-LinUCB.
+
 
 
 \begin{theorem}
@@ -59,8 +67,9 @@ For any fixed (\emph{i.e.}, not depending on $T$) delay $d$, this regret bound i
 \label{cor:geometric_mixing}
 Suppose that the noise satisfies Assumption \ref{ass:mixing-subgaussianity} with $\phi_d=Ce^{-\frac{d}{\tau}}$ for some $C,\tau >0$ (\emph{geometric mixing}), and set $d = \lceil \tau\log\tfrac{BCT}{p}\rceil$. Then, the regret of Mixing-LinUCB satisfies
 \begin{align*}
-&\Reg(T) = \mathcal{O}\Big(\tau p\sqrt{T}\left(\log\tfrac{TB\max(1,C)}{p}\right)^2 \\  &\quad+p\sqrt{T\tau}\log\tfrac{TB\max(1,C)}{p} + \tau\log\tfrac{BCT}{p}\sqrt{pT\log\tfrac{TB}{p\delta}}\Bigg)\,.
+&\Reg(T) = \mathcal{O}\Big(\tau p\sqrt{T}\left(\log \tfrac{T}{p}\right)^2  +p\sqrt{T\tau}\log \tfrac{T}{p} + \tau\log T\sqrt{pT\log\tfrac{T}{\delta}}\Bigg)\,.
 \end{align*}
+
 \end{corollary}
 
 \begin{corollary}
@@ -75,7 +84,7 @@ Up to a factor of $\tau\log T$, the bound for geometrically mixing noise matches
 
 \subsection{Gap-dependent regret bounds}
 
-Under the assumption that, each round, the gap between the expected reward of the optimal arm and the expected reward of any other arm is at least $\Delta > 0$, we get regret bounds with better dependence on $T$. More precisely, define the \emph{minimum gap} $\Delta = \min_{t \in [T]}\min_{x \in \mathcal{X}_t: x \neq X_t^{\star}}\siprod{X_t^{\star} - x}{\theta^{\star}}$, and assume that $\Delta > 0$. Since we either have $R_t = 0$ or $R_t \geq \Delta > 0$, it follows that
+Under the assumption that, each round, the gap between the expected reward of the optimal arm and the expected reward of any other arm is at least $\Delta > 0$, we get regret bounds with better dependence on $T$. More precisely, define the \emph{minimum gap} $\Delta = \min_{t \in [T]}\min_{x \in \mathcal{X}_t, x \neq X_t^{\star}}\siprod{X_t^{\star} - x}{\theta^{\star}}$, and assume that $\Delta > 0$. Since we either have $R_t = 0$ or $R_t \geq \Delta > 0$, it follows that
 \begin{equation*}
 R_t \leq R_t^2/\Delta\,.
 \end{equation*}
@@ -101,7 +110,7 @@ Similarly to the worst-case bound in \Cref{thm:worst_case_reg}, for any fixed $d
 \label{cor2:geometric_mixing}
 Suppose that the noise variables are geometrically mixing and set $d = \lceil \tau\log\tfrac{BCT}{p}\rceil$. Then the regret of Mixing-LinUCB satisfies
 \begin{align*}
-\Reg(T) = \mathcal{O}\left(\frac{8\tau p}{\Delta}\left(\log\frac{BCT}{p}\right)^2\log\left(1 + \frac{B^2T}{p\tau \log\frac{BCT}{p}}\right)\left(\frac{p}{2}\log\frac{T}{p\tau}+\log \frac{\tau\log \frac{BCT}{p}}{\delta}\right)\right)\,.
+\Reg(T) = \widetilde{\mathcal{O}}\left(\frac{4\tau p^2}{\Delta}\left(\log T\right)^4\right)\,.
 \end{align*}
 \label{cor:gap_reg_geo}
 \end{corollary}
@@ -110,7 +119,7 @@ Suppose that the noise variables are geometrically mixing and set $d = \lceil \t
 \label{cor2:algebraic_mixing}
 Suppose that the noise variables are algebraically mixing and set $d=\lceil CT^{1/(1+r)}\rceil$. Then the regret of Mixing-LinUCB satisfies
 \begin{equation*}
-\OO\left( \frac{8Cp}{\Delta}T^{\frac{2}{1+r}}\log\left(1 + \frac{B^2T}{pCT^{1/(1+r)}}\right)\left(\frac{p}{2}\log\frac{(B+1)^2eT}{p}+\log \frac{CT^{1/(1+r)}}{\delta}\right)\right)\,.
+\OO\left( \frac{4Crp^2}{\Delta(1+r)}T^{\frac{2}{1+r}}\log\left(T\right)^2\left(1+\frac{1}{1+r}\log \frac{1}{\delta}\right)\right)\,.
 \end{equation*}
 \label{cor:gap_reg_alg}
 \end{corollary}
