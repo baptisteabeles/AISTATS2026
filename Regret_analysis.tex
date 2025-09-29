@@ -29,7 +29,7 @@ Next, we separate the regret suffered in the first $d$ rounds and the remaining 
 &\Reg(T) \leq 2dB + \sqrt{(T-d){\textstyle\sum\limits_{t=d+1}^{T}}R_t^2}\\
 &\leq 2dB + \sqrt{4(T-d)\zeta_{T}{\textstyle\sum\limits_{t=d+1}^{T}}\min(1, \|X_t\|_{V_{t-d}^{-1}}^2)}\,.
 \end{align*}
-where we have defined $\zeta_t=\max(B^2, \beta_{t-d}^2).$
+where we have defined for $t>0,$ $\zeta_t=\max(B^2, \beta_{t-d}^2).$
 
 
 
@@ -55,7 +55,6 @@ Fix $\lambda = 1/B^2$, $d>0$ and $\delta\in(0,1)$. With probability at least $1 
 \end{align*}
 \label{thm:worst_case_reg}
 \end{theorem}
-
 From the definition of $\beta_T$, we see that this regret bound is of the order
 \begin{align*}
 \Reg(T)  &= \mathcal{O}\Big(dB + dp\sqrt{T}\log\tfrac{TB}{dp} \\+& T\sqrt{Bdp\phi_d\log\tfrac{TB}{dp}} + d\sqrt{pT\log\tfrac{TB}{p\delta}}\Big)\,.
@@ -67,7 +66,8 @@ For any fixed (\emph{i.e.}, not depending on $T$) delay $d$, this regret bound i
 \label{cor:geometric_mixing}
 Suppose that the noise satisfies Assumption \ref{ass:mixing-subgaussianity} with $\phi_d=Ce^{-\frac{d}{\tau}}$ for some $C,\tau >0$ (\emph{geometric mixing}), and set $d = \lceil \tau\log\tfrac{BCT}{p}\rceil$. Then, the regret of Mixing-LinUCB satisfies
 \begin{align*}
-&\Reg(T) = \mathcal{O}\Big(\tau p\sqrt{T}\left(\log \tfrac{T}{p}\right)^2  +p\sqrt{T\tau}\log \tfrac{T}{p} + \tau\log T\sqrt{pT\log\tfrac{T}{\delta}}\Bigg)\,.
+\Reg(T)=   \mathcal{O}&\Big(\tau p\sqrt{T}\left(\log \tfrac{T}{p}\right)^2  
++p\sqrt{T\tau}\log \tfrac{T}{p} \\&+ \tau\log T\sqrt{pT\log\tfrac{T}{\delta}}\Bigg)\,.
 \end{align*}
 
 \end{corollary}
@@ -80,7 +80,7 @@ Suppose that the noise satisfies Assumption \ref{ass:mixing-subgaussianity} with
 \label{cor:algebraic_mixing}
 \end{corollary}
 
-Up to a factor of $\tau\log T$, the bound for geometrically mixing noise matches the regret bound for linear UCB with i.i.d.~noise. This bound is trivial for $r\leq 1$, however for $r>1$ we get sublinear regret, and in particular we recover standard rates up to logarithmic factors in the limit where $r \to \infty.$
+Up to a factor of $\tau\log T$, the bound for geometrically mixing noise matches the regret bound for linear UCB with i.i.d.~noise. Under algebraic mixing the bound becomes trivial for $r\leq 1$, however for $r>1$ we get sublinear regret, and in particular we recover standard rates up to logarithmic factors in the limit where $r \to \infty.$
 
 \subsection{Gap-dependent regret bounds}
 
@@ -119,7 +119,7 @@ Suppose that the noise variables are geometrically mixing and set $d = \lceil \t
 \label{cor2:algebraic_mixing}
 Suppose that the noise variables are algebraically mixing and set $d=\lceil CT^{1/(1+r)}\rceil$. Then the regret of Mixing-LinUCB satisfies
 \begin{equation*}
-\OO\left( \frac{4Crp^2}{\Delta(1+r)}T^{\frac{2}{1+r}}\log\left(T\right)^2\left(1+\frac{1}{1+r}\log \frac{1}{\delta}\right)\right)\,.
+\OO\left( \frac{4Crp^2}{\Delta(1+r)}T^{\frac{2}{1+r}}\left(\log T\right)^2\right)\,.
 \end{equation*}
 \label{cor:gap_reg_alg}
 \end{corollary}
