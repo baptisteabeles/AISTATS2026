@@ -84,4 +84,5 @@ quantification of the true parameter $\theta^\star$ and the associated rewards.
 \end{algorithm} 
 
 In Section \ref{sec:bandit_regret} we provide a detailed analysis of the regret of the algorithm that we proposed. For instance, assuming that the mixing coefficients decay exponentially as $\phi_d = C e^{-d/\tau}$ (\emph{geometric mixing}), we show that the regret can be upper bounded in high probability as  \[\Reg(T) \leq \OO\left(\tau p\sqrt{T}\log(T)^2+\tau \log T\sqrt{pT \log T}\right).\]
-We refer to Theorem \ref{thm:worst_case_reg} and Corollary \ref{cor:geometric_mixing} in Section \ref{sec:bandit_regret} for more details.
+If we neglect log factors, this result shows that when the  dependencies between the noise vanish very quickly, our bound matches the optimal rate for the standard i.i.d. case up to a multiplicative constant $\tau$. This constant can be intuitively understood as the characteristic time between two \textit{almost} i.i.d. data points.
+We refer to Theorem \ref{thm:worst_case_reg} and Corollary \ref{cor:geometric_mixing} in Section \ref{sec:bandit_regret} for more details. 
